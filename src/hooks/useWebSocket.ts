@@ -19,8 +19,11 @@ export function useWebSocket(): UseWebSocketResult {
   const [error, setError] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const shouldReconnectRef = useRef(false);
 
   const connect = useCallback(() => {
+    shouldReconnectRef.current = true;
+
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
     try {
@@ -36,6 +39,11 @@ export function useWebSocket(): UseWebSocketResult {
       ws.onclose = () => {
         setIsConnected(false);
         console.log('WebSocket disconnected');
+
+        if (!shouldReconnectRef.current) {
+          console.log('Reconnect skipped (user stopped)');
+          return;
+        }
 
         // Auto-reconnect after 3 seconds
         reconnectTimeoutRef.current = setTimeout(() => {
@@ -70,6 +78,8 @@ export function useWebSocket(): UseWebSocketResult {
   }, []);
 
   const disconnect = useCallback(() => {
+    shouldReconnectRef.current = false;
+
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
     }
