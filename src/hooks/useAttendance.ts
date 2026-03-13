@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { AttendanceCurrentResponse, AttendanceUpdate } from '../types';
-import { getCurrentAttendance } from '../services/api';
+import { AttendanceCurrentResponse, AttendanceUpdate } from '../types/test';
+import { getCurrentAttendance } from '../services/test';
 
 export function useAttendance(lastUpdate: AttendanceUpdate | null) {
   const [attendance, setAttendance] = useState<AttendanceCurrentResponse | null>(null);

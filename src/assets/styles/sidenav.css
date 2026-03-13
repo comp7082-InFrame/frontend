@@ -1,0 +1,40 @@
+.sidenav-container {
+    top: 50px;
+    width: 200px;
+    height: 100vh;
+    background-color: var(--sidenav-bg-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidenav-item {
+    height: 35;
+    padding-left: 2.5rem;
+    cursor: pointer;
+    background-color: transparent;
+    color: #fff;
+}
+
+.sidenav-item:hover {
+    background-color: rgba(125, 145, 152, 0.3) !important;
+}
+
+.sidenav-item.selected {
+    background-color: #7d9198 !important;
+}
+
+.sidenav-item .item-icon,
+.sidenav-item .item-icon svg {
+    min-width: 24px;
+    width: 24px;
+    height: 24px;
+    margin-right: 1.25rem;
+    color: white;
+}
+
+.sidenav-item .item-text,
+.sidenav-item .item-text .MuiTypography-root {
+    font-weight: 600 !important;
+    white-space: nowrap;
+    color: #fff;
+}

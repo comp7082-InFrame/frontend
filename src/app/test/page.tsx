@@ -1,13 +1,13 @@
+'use client'
 import React, { useState } from 'react';
-import { VideoStream } from './components/VideoStream';
-import { AttendancePanel } from './components/AttendancePanel';
-import { EnrollmentForm } from './components/EnrollmentForm';
-import { RosterList } from './components/RosterList';
-import { useWebSocket } from './hooks/useWebSocket';
-import { useAttendance } from './hooks/useAttendance';
-import { useRoster } from './hooks/useRoster';
-
-import css from './App.module.css';
+import css from '@/app/page.module.css';
+import { AttendancePanel } from '@/components/test/AttendancePanel';
+import { EnrollmentForm } from '@/components/test/EnrollmentForm';
+import { RosterList } from '@/components/test/RosterList';
+import { VideoStream } from '@/components/test/VideoStream';
+import { useAttendance } from '@/hooks/useAttendance';
+import { useRoster } from '@/hooks/useRoster';
+import { useWebSocket } from '@/hooks/useWebSocket';
 
 const styles: { [key: string]: React.CSSProperties } = {
   app: {

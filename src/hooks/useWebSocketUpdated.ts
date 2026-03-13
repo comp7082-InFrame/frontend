@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { StreamFrame, AttendanceUpdate, WebSocketMessage } from '../types/test';
 
 const WS_URL = 'ws://localhost:8000/ws/stream';
@@ -8,7 +8,7 @@ interface UseWebSocketResult {
   lastFrame: StreamFrame | null;
   lastUpdate: AttendanceUpdate | null;
   error: string | null;
-  connect: () => void;
+  connect: (session_id: number, class_id: string, duration: number) => void;
   disconnect: () => void;
 }
 
@@ -19,18 +19,27 @@ export function useWebSocket(): UseWebSocketResult {
   const [error, setError] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const connect = useCallback((session_idParam?: number, class_idParam?: string, duration: number = 10) => {
+    console.log(session_idParam, class_idParam, duration)
+    const sid = session_idParam;
+    const cid = class_idParam;
 
-  const connect = useCallback(() => {
+    if (!sid || !cid) return;
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
     try {
-      const ws = new WebSocket(WS_URL);
+      let url = WS_URL + `?session_id=${sid}&class_id=${cid}`
+      const ws = new WebSocket(url);
       wsRef.current = ws;
 
       ws.onopen = () => {
+
         setIsConnected(true);
         setError(null);
         console.log('WebSocket connected');
+        setTimeout(() => {
+          disconnect()
+        }, (duration * 60 * 1000))
       };
 
       ws.onclose = () => {
@@ -38,10 +47,10 @@ export function useWebSocket(): UseWebSocketResult {
         console.log('WebSocket disconnected');
 
         // Auto-reconnect after 3 seconds
-        reconnectTimeoutRef.current = setTimeout(() => {
-          console.log('Attempting to reconnect...');
-          connect();
-        }, 3000);
+        // reconnectTimeoutRef.current = setTimeout(() => {
+        //   console.log('Attempting to reconnect...');
+        //   connect(sid, cid, duration);
+        // }, 3000);
       };
 
       ws.onerror = () => {
@@ -66,7 +75,6 @@ export function useWebSocket(): UseWebSocketResult {
       };
     } catch (e) {
       setError('Failed to connect to WebSocket');
-      console.log(e)
     }
   }, []);
 

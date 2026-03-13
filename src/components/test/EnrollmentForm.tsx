@@ -1,9 +1,11 @@
+import { enrollPerson } from '@/services/test';
 import React, { useState, useRef } from 'react';
-import { enrollPerson } from '../services/api';
 
 interface EnrollmentFormProps {
   onEnrollSuccess: () => void;
 }
+
+const user_id= '511a0802-e567-40bc-b653-c6840a060851'; // Temporary use
 
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
@@ -99,7 +101,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ onEnrollSuccess 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -123,7 +125,7 @@ export const EnrollmentForm: React.FC<EnrollmentFormProps> = ({ onEnrollSuccess 
     setMessage(null);
 
     try {
-      await enrollPerson(name.trim(), photo);
+      await enrollPerson(name.trim(), photo, user_id);
       setMessage({ type: 'success', text: `Successfully enrolled ${name}` });
       setName('');
       setPhoto(null);

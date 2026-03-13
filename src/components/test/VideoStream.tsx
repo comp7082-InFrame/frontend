@@ -1,5 +1,5 @@
 import React from 'react';
-import { StreamFrame } from '../types';
+import { StreamFrame } from '@/types/test';
 
 interface VideoStreamProps {
   frame: StreamFrame | null;

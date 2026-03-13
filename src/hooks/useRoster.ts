@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Person } from '../types';
-import { getRoster } from '../services/api';
+import { Person } from '../types/test';
+import { getRoster } from '@/services/test';
 
 export function useRoster() {
   const [roster, setRoster] = useState<Person[]>([]);

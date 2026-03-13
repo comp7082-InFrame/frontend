@@ -1,6 +1,6 @@
 import React from 'react';
-import { Person } from '../types';
-import { removePerson, getPersonPhotoUrl } from '../services/api';
+import { Person } from '@/types/test';
+import { removePerson, getPersonPhotoUrl } from '@/services/test';
 
 interface RosterListProps {
   roster: Person[];

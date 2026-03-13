@@ -1,0 +1,41 @@
+.secondary-btn {
+    background-color: var(--secondary-btn-bg-color) !important;
+    color: var(--secondary-btn-text-color) !important;
+}
+
+.icon-btn {
+    color: var(--primary-text-color) !important;
+    background-color: transparent !important;
+}
+
+.icon-btn:hover {
+    border: solid 1px var(--primary-text-color);
+}
+
+.secondary-btn:hover {
+    background-color: var(--secondary-btn-hover-bg-color) !important;
+}
+
+.MuiMenuItem-root:hover {
+    background-color: var(--primary-btn-hover-bg-color) !important;
+}
+
+.form-lbl {
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.form-item {
+    display: flex;
+    align-items: start;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}

@@ -1,0 +1,13 @@
+.info-div {
+    display: flex;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.info-div>p {
+    width: 250px;
+}
+
+.info-div b {
+    margin: 0px;
+}
