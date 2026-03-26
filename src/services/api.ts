@@ -140,3 +140,8 @@ export const getAttendanceRecords = async (session_id: number): Promise<any> => 
     const response = await api.get(url)
     return response.data;
 }
+
+export const getCameras = async (): Promise<{ id: number; name: string }[]> => {
+    const response = await api.get('/cameras/');
+    return response.data;
+}
