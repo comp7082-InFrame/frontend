@@ -13,7 +13,7 @@ import { useCourses } from '@/hooks/useCourse';
 import { useBuildings } from '@/hooks/useBuilding';
 import { useCurrentTerm } from '@/hooks/useTerm';
 import { useWebSocket } from '@/hooks/useWebSocketUpdated';
-import { createSession } from '@/services/api';
+import { createSession, getCameras } from '@/services/api';
 import { useTeacherClasses } from '@/hooks/useTeacherClasses';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
@@ -30,7 +30,8 @@ export function StartSessionDialog({ openDialog, selectedEvent, setOpenDialog, c
     const [room_id, setRoom] = useState('');
     const [selectedRoom, setselectedRoom] = useState<any>(null);
     const [building_id, setBuilding] = useState('');
-    const [cameratype, setCameraType] = useState('your_camera');
+    const [cameras, setCameras] = useState<{ id: number; name: string }[]>([]);
+    const [cameraId, setCameraId] = useState('');
     const [currentClass, setCurrentClass] = useState(null);
     const [class_id, setClassID] = useState('');
     const [session, setSession] = useState<any>(null);
@@ -96,6 +97,27 @@ export function StartSessionDialog({ openDialog, selectedEvent, setOpenDialog, c
         }
     }, [building_id]);
 
+    useEffect(() => {
+        if (!openDialog) return;
+
+        let isActive = true;
+        getCameras()
+            .then((availableCameras) => {
+                if (!isActive) return;
+                setCameras(availableCameras);
+                setCameraId(availableCameras.length > 0 ? String(availableCameras[0].id) : '');
+            })
+            .catch(() => {
+                if (!isActive) return;
+                setCameras([]);
+                setCameraId('');
+            });
+
+        return () => {
+            isActive = false;
+        };
+    }, [openDialog]);
+
     // const today = new Date()
 
     useEffect(() => {
@@ -125,7 +147,7 @@ export function StartSessionDialog({ openDialog, selectedEvent, setOpenDialog, c
         setRoom('');
     };
     const handleCameraTypeChange = (event: SelectChangeEvent) => {
-        setCameraType(event.target.value);
+        setCameraId(event.target.value);
     }
     const handleCampusChange = (event: SelectChangeEvent) => {
         setBuilding('');
@@ -147,7 +169,7 @@ export function StartSessionDialog({ openDialog, selectedEvent, setOpenDialog, c
 
 
     const createNewSession = async () => {
-        if (!course_id || !campus_id || !building_id || !room_id || !cameratype) {
+        if (!course_id || !campus_id || !building_id || !room_id || !cameraId) {
             alert('Please fill in all required fields');
             return;
         }
@@ -165,7 +187,7 @@ export function StartSessionDialog({ openDialog, selectedEvent, setOpenDialog, c
                     message: "Connecting to Server",
                     duration: duration * 60 * 1000
                 });
-                connect(res.id, res.class_id, duration);
+                connect(res.id, res.class_id, duration, Number(cameraId));
             }
         )
 
@@ -327,13 +349,20 @@ export function StartSessionDialog({ openDialog, selectedEvent, setOpenDialog, c
 
                                 <b className='form-lbl'>Camera: </b>
                                 <Select
-                                    value={cameratype}
+                                    value={cameraId}
                                     onChange={handleCameraTypeChange}
                                     size="small"
+                                    displayEmpty
                                 >
-                                    <MenuItem value={'your_camera'}>Your camera</MenuItem>
-                                    <MenuItem value={'room_camera'} disabled={selectedRoom == null || selectedRoom.camera_connection == null || selectedRoom.camera_connection == ''}>Room Camera</MenuItem>
+                                    {cameras.length === 0 ? (
+                                        <MenuItem value="" disabled>No cameras detected</MenuItem>
+                                    ) : cameras.map((camera) => (
+                                        <MenuItem key={camera.id} value={String(camera.id)}>{camera.name}</MenuItem>
+                                    ))}
                                 </Select>
+                                {cameras.length === 0 && (
+                                    <Typography color="error" variant="body2">No cameras detected.</Typography>
+                                )}
                             </div>
                         </div>
                     </>
@@ -341,7 +370,7 @@ export function StartSessionDialog({ openDialog, selectedEvent, setOpenDialog, c
 
                 <DialogActions>
                     <Button className='secondary-btn' onClick={setOpenDialog}>Close</Button>
-                    <Button onClick={createNewSession}>Start</Button>
+                    <Button onClick={createNewSession} disabled={cameras.length === 0}>Start</Button>
                 </DialogActions>
             </Dialog>
         </>

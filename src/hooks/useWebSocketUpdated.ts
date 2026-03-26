@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { StreamFrame, AttendanceUpdate, WebSocketMessage } from '../types/test';
 
 const WS_URL = 'ws://localhost:8000/ws/stream';
@@ -8,7 +8,7 @@ interface UseWebSocketResult {
   lastFrame: StreamFrame | null;
   lastUpdate: AttendanceUpdate | null;
   error: string | null;
-  connect: (session_id: number, class_id: string, duration: number) => void;
+  connect: (session_id: number, class_id: string, duration: number, camera_id?: number) => void;
   disconnect: () => void;
 }
 
@@ -19,8 +19,19 @@ export function useWebSocket(): UseWebSocketResult {
   const [error, setError] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const connect = useCallback((session_idParam?: number, class_idParam?: string, duration: number = 10) => {
-    console.log(session_idParam, class_idParam, duration)
+  const disconnect = useCallback(() => {
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+    }
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+    setIsConnected(false);
+  }, []);
+
+  const connect = useCallback((session_idParam?: number, class_idParam?: string, duration: number = 10, camera_id: number = 0) => {
+    console.log(session_idParam, class_idParam, duration, camera_id)
     const sid = session_idParam;
     const cid = class_idParam;
 
@@ -28,7 +39,7 @@ export function useWebSocket(): UseWebSocketResult {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
     try {
-      let url = WS_URL + `?session_id=${sid}&class_id=${cid}`
+      const url = WS_URL + `?session_id=${sid}&class_id=${cid}&camera_id=${camera_id}`
       const ws = new WebSocket(url);
       wsRef.current = ws;
 
@@ -73,21 +84,10 @@ export function useWebSocket(): UseWebSocketResult {
           console.error('Failed to parse WebSocket message:', e);
         }
       };
-    } catch (e) {
+    } catch {
       setError('Failed to connect to WebSocket');
     }
-  }, []);
-
-  const disconnect = useCallback(() => {
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-    }
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
-    }
-    setIsConnected(false);
-  }, []);
+  }, [disconnect]);
 
   useEffect(() => {
     return () => {
