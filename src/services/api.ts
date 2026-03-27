@@ -7,12 +7,49 @@ const api = axios.create({
     baseURL: API_BASE_URL,
 });
 
+export type AdminEnrollmentPayload = {
+    first_name: string;
+    last_name: string;
+    student_number: string;
+    date_of_birth: string;
+    photo: File;
+    government_id_photo?: File | null;
+};
+
+export type AdminEnrollmentResponse = {
+    user_id: string;
+    student_number: string;
+    name: string;
+    photo_path?: string | null;
+    enrolled: boolean;
+};
+
 export const getCampuses = async (campus_id?: string): Promise<any> => {
     let url_string = '/campuses/'
     if (campus_id && campus_id != '') {
         url_string += '?campus_id=' + campus_id;
     }
     const response = await api.get(url_string);
+    return response.data;
+}
+
+export const submitAdminEnrollment = async (
+    payload: AdminEnrollmentPayload
+): Promise<AdminEnrollmentResponse> => {
+    const formData = new FormData();
+    formData.append("first_name", payload.first_name);
+    formData.append("last_name", payload.last_name);
+    formData.append("student_number", payload.student_number);
+    formData.append("date_of_birth", payload.date_of_birth);
+    formData.append("photo", payload.photo);
+
+    if (payload.government_id_photo) {
+        formData.append("government_id_photo", payload.government_id_photo);
+    }
+
+    const response = await api.post("/enrollment/admin", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
     return response.data;
 }
 

@@ -24,6 +24,7 @@ type SidenavProps = {
 const menuByRole: Record<string, MenuItem[]> = {
     admin: [
         { label: "Dashboard", path: "/", icon: <MdOutlineDashboard  /> },
+        { label: "Admin", path: "/admin", icon: <IoPerson /> },
         { label: "Teachers", path: "/admin/teachers", icon: <IoPerson /> },
         { label: "Students", path: "/admin/students", icon: <PiStudent /> },
         { label: "New Request", path: "/admin/newrequest", icon: <BsPersonFillExclamation /> },
@@ -31,6 +32,7 @@ const menuByRole: Record<string, MenuItem[]> = {
     ],
     teacher: [
         { label: "Dashboard", path: "/", icon: <MdOutlineDashboard  /> },
+        { label: "Admin", path: "/admin", icon: <IoPerson /> },
         { label: "Sessions", path: "/sessions", icon: <RiCalendarTodoLine  /> },
     ],
     student: [

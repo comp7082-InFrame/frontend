@@ -4,7 +4,11 @@ import Image from "next/image";
 import Logo from "@/assets/images/logo.svg";
 import "@/assets/styles/header.css";
 
-export default function DashboardHeader() {
+type DashboardHeaderProps = {
+    title?: string;
+};
+
+export default function DashboardHeader({ title = "Dashboard" }: DashboardHeaderProps) {
     return (
         <AppBar
             position="fixed"
@@ -25,7 +29,7 @@ export default function DashboardHeader() {
                     component="div"
                     className="header-title"
                 >
-                    Dashboard
+                    {title}
                 </Typography>
 
                 <Avatar className="avatar-div"
