@@ -1,6 +1,7 @@
+import { Suspense } from "react";
 import Sessions from "@/components/sessions/Sessions";
 
-export default function DashboardPage() {
+function SessionsPageContent() {
   // const role = session.user.role
   const role = "teacher";
 
@@ -10,4 +11,12 @@ export default function DashboardPage() {
     default:
       return null
   }
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={null}>
+      <SessionsPageContent />
+    </Suspense>
+  );
 }
