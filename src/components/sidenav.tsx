@@ -8,6 +8,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { JSX } from "react";
 import { RiCalendarTodoLine } from "react-icons/ri";
 import { BsCameraVideoFill } from "react-icons/bs";
+import { AppRole } from "@/utils/authStub";
 
 type MenuItem = {
     label: string;
@@ -16,7 +17,7 @@ type MenuItem = {
 };
 
 type SidenavProps = {
-    role: "admin" | "teacher" | "student";
+    role: AppRole;
 };
 
 const menuByRole: Record<string, MenuItem[]> = {
@@ -27,7 +28,6 @@ const menuByRole: Record<string, MenuItem[]> = {
     teacher: [
         { label: "Sessions", path: "/sessions", icon: <RiCalendarTodoLine  /> },
     ],
-    student: [],
 };
 
 const Sidenav: React.FC<SidenavProps> = ({ role }) => {
