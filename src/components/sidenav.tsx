@@ -4,9 +4,10 @@ import { Box, List, ListItemButton, ListItemIcon, ListItemText } from "@mui/mate
 import { PiStudent } from "react-icons/pi";
 import Link from "next/link";
 import "@/assets/styles/sidenav.css";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { JSX } from "react";
 import { RiCalendarTodoLine } from "react-icons/ri";
+import { BsCameraVideoFill } from "react-icons/bs";
 
 type MenuItem = {
     label: string;
@@ -21,6 +22,7 @@ type SidenavProps = {
 const menuByRole: Record<string, MenuItem[]> = {
     admin: [
         { label: "Students", path: "/", icon: <PiStudent /> },
+        { label: "Cameras", path: "/?view=camera", icon: <BsCameraVideoFill /> },
     ],
     teacher: [
         { label: "Sessions", path: "/sessions", icon: <RiCalendarTodoLine  /> },
@@ -30,13 +32,17 @@ const menuByRole: Record<string, MenuItem[]> = {
 
 const Sidenav: React.FC<SidenavProps> = ({ role }) => {
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const menu = menuByRole[role] || [];
+    const currentPath = pathname === "/" && searchParams.get("view") === "camera"
+        ? "/?view=camera"
+        : pathname;
 
     return (
         <Box className="sidenav-container" position="fixed">
             <List sx={{ p: 0, mt: 0 }}>
                 {menu.map((item) => {
-                    const selected = pathname == (item.path);
+                    const selected = currentPath === item.path;
                     return (
                         <ListItemButton
                             key={item.path}

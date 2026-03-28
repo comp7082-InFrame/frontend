@@ -4,15 +4,18 @@ import Button from "@mui/material/Button";
 import Image from "next/image";
 import Logo from "@/assets/images/logo.svg";
 import "@/assets/styles/header.css";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { clearStoredRole, getStoredRole } from "@/utils/authStub";
 
 export default function DashboardHeader() {
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const router = useRouter();
     const role = getStoredRole();
 
-    const title = pathname === "/" && role === "admin"
+    const title = pathname === "/" && role === "admin" && searchParams.get("view") === "camera"
+        ? "Cameras"
+        : pathname === "/" && role === "admin"
         ? "Students"
         : pathname === "/" && role === "teacher"
             ? "Sessions"
@@ -48,7 +51,7 @@ export default function DashboardHeader() {
                         className="header-logout"
                         onClick={() => {
                             clearStoredRole();
-                            router.push("/");
+                            window.location.href = "/";
                         }}
                     >
                         Logout

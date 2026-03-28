@@ -1,11 +1,13 @@
 'use client'
 
 import type { CSSProperties } from "react";
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import Sessions from "@/components/sessions/Sessions";
 import AdminStudents from "@/components/admin/AdminStudents";
+import AdminCameraPage from "@/components/admin/AdminCameraPage";
 import { AppRole, getStoredRole, setStoredRole } from "@/utils/authStub";
+import { useSearchParams } from "next/navigation";
 
 const styles: Record<string, CSSProperties> = {
   page: {
@@ -56,11 +58,23 @@ const styles: Record<string, CSSProperties> = {
   },
 };
 
-export default function HomePage() {
-  const [role, setRole] = useState<AppRole | null>(() => getStoredRole());
+function HomeContent() {
+  const [isReady, setIsReady] = useState(false);
+  const [role, setRole] = useState<AppRole | null>(null);
+  const searchParams = useSearchParams();
+  const view = searchParams.get('view');
+
+  useEffect(() => {
+    setRole(getStoredRole());
+    setIsReady(true);
+  }, []);
+
+  if (!isReady) {
+    return null;
+  }
 
   if (role === 'admin') {
-    return <AdminStudents />;
+    return view === 'camera' ? <AdminCameraPage /> : <AdminStudents />;
   }
 
   if (role === 'teacher') {
@@ -100,5 +114,13 @@ export default function HomePage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
   );
 }

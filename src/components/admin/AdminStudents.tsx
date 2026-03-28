@@ -32,7 +32,7 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type CourseOption = {
   id: string;
@@ -70,22 +70,32 @@ export default function StudentsPage() {
   const termId = currentTerm?.id ?? '';
   const { courses } = useCourses(termId, '') as { courses: CourseOption[] };
 
-  const loadStudents = async () => {
+  const loadStudents = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getStudents();
       setStudents(data);
       setError(null);
     } catch {
-      setError('Failed to load students');
+      setError('Failed to load students. Check that the backend is running and connected to the database.');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     void loadStudents();
-  }, []);
+  }, [loadStudents]);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      void loadStudents();
+    }, 3000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [loadStudents]);
 
   const submitStudent = async () => {
     if (!form.photo) {
@@ -111,7 +121,7 @@ export default function StudentsPage() {
       setForm(emptyStudentForm);
       setError(null);
     } catch {
-      setError('Failed to create student');
+      setError('Failed to create student. Verify the backend is running and that classes are available.');
     } finally {
       setSubmitting(false);
     }
@@ -239,6 +249,7 @@ export default function StudentsPage() {
               value={form.course_ids}
               onChange={handleCourseChange}
               input={<OutlinedInput label="Classes" />}
+              disabled={courses.length === 0}
               renderValue={(selected) =>
                 courses
                   .filter((course) => selected.includes(course.id))
@@ -253,6 +264,11 @@ export default function StudentsPage() {
               ))}
             </Select>
           </FormControl>
+          {courses.length === 0 && (
+            <Alert severity="info">
+              No classes are available yet. Make sure the backend is running and the current term has courses.
+            </Alert>
+          )}
           <Button variant="outlined" component="label">
             {form.photo ? `Photo selected: ${form.photo.name}` : 'Upload student photo'}
             <input
