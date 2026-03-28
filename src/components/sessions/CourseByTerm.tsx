@@ -1,7 +1,7 @@
 'use client'
 
-import { Accordion, AccordionSummary, AccordionDetails, Button, Tooltip, Typography, CircularProgress } from "@mui/material";
-import { useRef, useState } from "react";
+import { Accordion, AccordionSummary, AccordionDetails, Typography, CircularProgress } from "@mui/material";
+import { useState } from "react";
 import { Fragment } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AttendanceRecord from "./AttendanceRecord";
@@ -19,7 +19,7 @@ function CourseByTerm() {
     const [courseAttendanceRecord, setCourseAttendanceRecord] = useState<Record<string, any[]>>({});
 
     const [loadingCourseAttendanceHis, setLoadingCourseAttendanceHis] = useState<string | null>(null);
-    const [loadingCourseAttendanceDetail, setLoadingCourseAtendanceDetail] = useState<number | null>(null);
+    const [loadingCourseAttendanceDetail, setLoadingCourseAtendanceDetail] = useState<string | null>(null);
     const loadAttendanceSessions = async (topId: string, course_id: string) => {
         setLoadingCourseAttendanceHis(topId);
 
@@ -28,7 +28,7 @@ function CourseByTerm() {
         setCourseAttendanceRecordAccordions((prev) => ({ ...prev, [topId]: data }));
         setLoadingCourseAttendanceHis(null);
     };
-    const loadCourseAttendanceRecords = async (childId: number) => {
+    const loadCourseAttendanceRecords = async (childId: string) => {
         setLoadingCourseAtendanceDetail(childId);
 
         const data = await getAttendanceRecords(childId)
@@ -37,101 +37,19 @@ function CourseByTerm() {
         setLoadingCourseAtendanceDetail(null);
     };
 
-    const { courses: courses, loading: courseLoading, refetch: refetchCourses } = useTeacherCourseTerm(teacher_id);
-
-
-    const records = [
-        {
-            id: "A01234567",
-            firstName: "Alice",
-            lastName: "Nguyen",
-            status: "Present",
-            attendanceRate: "100%",
-        },
-        {
-            id: "A01234567",
-            firstName: "Brian",
-            lastName: "Smith",
-            status: "Present",
-            attendanceRate: "100%",
-        },
-        {
-            id: "A01234567",
-            firstName: "Chloe",
-            lastName: "Tran",
-            status: "Present",
-            attendanceRate: "100%",
-        },
-        {
-            id: "A01234567",
-            firstName: "Daniel",
-            lastName: "Lee",
-            status: "Present",
-            attendanceRate: "100%",
-        },
-        {
-            id: "A01234567",
-            firstName: "Emma",
-            lastName: "Johnson",
-            status: "Present",
-            attendanceRate: "100%",
-        },
-        {
-            id: "A01234567",
-            firstName: "Frank",
-            lastName: "Brown",
-            status: "Present",
-            attendanceRate: "100%",
-        },
-        {
-            id: "A01234567",
-            firstName: "Grace",
-            lastName: "Wilson",
-            status: "Present",
-            attendanceRate: "100%",
-        },
-        {
-            id: "A01234567",
-            firstName: "Henry",
-            lastName: "Kim",
-            status: "Present",
-            attendanceRate: "100%",
-        },
-        {
-            id: "A01234567",
-            firstName: "Isabella",
-            lastName: "Martinez",
-            status: "Present",
-            attendanceRate: "100%",
-        },
-        {
-            id: "A01234567",
-            firstName: "Jason",
-            lastName: "Patel",
-            status: "Present",
-            attendanceRate: "100%",
-        },
-        {
-            id: "A01234567",
-            firstName: "Kevin",
-            lastName: "Chen",
-            status: "Absent",
-            attendanceRate: "100%",
-        },
-        {
-            id: "A01234567",
-            firstName: "Lily",
-            lastName: "Park",
-            status: "Absent",
-            attendanceRate: "100%",
-        },
-    ];
+    const { courses: courses, loading: courseLoading } = useTeacherCourseTerm(teacher_id);
     const courseandTermSections: any = courses;
     return (
         <Fragment>
             <div>
                 <div>
-                    {courseandTermSections.map((section: any, index: number) => {
+                    {courseLoading && <CircularProgress size={24} />}
+                    {!courseLoading && courseandTermSections.length === 0 && (
+                        <Typography sx={{ fontStyle: "italic", color: "gray" }}>
+                            No courses are available for this teacher yet.
+                        </Typography>
+                    )}
+                    {courseandTermSections.map((section: any) => {
                         return (<Accordion key={section.id}
                             expanded={expandedCourseTerm === section.id}
                             onChange={async (_, isExpanded) => {
@@ -147,8 +65,8 @@ function CourseByTerm() {
 
                             <AccordionDetails>
                                 {loadingCourseAttendanceHis === section.id && <CircularProgress size={20} />}
-                                {!loadingCourseAttendanceHis && courseAttendanceRecordAccordions[section.id] ? (
-                                    courseAttendanceRecordAccordions[section.id].map((child: any, i: number) => (
+                                {!loadingCourseAttendanceHis && courseAttendanceRecordAccordions[section.id]?.length ? (
+                                    courseAttendanceRecordAccordions[section.id].map((child: any) => (
                                         <Accordion key={child.id}
                                             expanded={expandedCourseAttendanceHis === child.id}
                                             onChange={async (_, isExpanded) => {
@@ -164,15 +82,20 @@ function CourseByTerm() {
 
                                             <AccordionDetails>
                                                 {loadingCourseAttendanceDetail === child.id && <CircularProgress size={20} />}
-                                                {!loadingCourseAttendanceDetail && courseAttendanceRecord[child.id] && (
+                                                {!loadingCourseAttendanceDetail && !!courseAttendanceRecord[child.id]?.length && (
                                                     <AttendanceRecord records={courseAttendanceRecord[child.id]} />
+                                                )}
+                                                {!loadingCourseAttendanceDetail && courseAttendanceRecord[child.id] && courseAttendanceRecord[child.id].length === 0 && (
+                                                    <Typography sx={{ fontStyle: "italic", color: "gray" }}>
+                                                        No students are enrolled for this session.
+                                                    </Typography>
                                                 )}
                                             </AccordionDetails>
                                         </Accordion>
                                     ))
                                 ) : (
                                     <Typography sx={{ fontStyle: "italic", color: "gray" }}>
-                                        No data available
+                                        No attendance sessions are available for this course.
                                     </Typography>
 
                                 )}

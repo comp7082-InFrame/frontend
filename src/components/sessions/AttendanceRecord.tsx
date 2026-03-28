@@ -1,5 +1,4 @@
-
-import { TableContainer, Paper, Table, TableBody, TableRow, TableCell, TableFooter, TablePagination, TablePaginationActions, TableHead, Menu, MenuItem, Button } from '@mui/material';
+import { TableContainer, Paper, Table, TableBody, TableRow, TableCell, TableFooter, TablePagination, TablePaginationActions, TableHead, Chip } from '@mui/material';
 import { useState } from 'react';
 import '@/assets/styles/form.css';
 
@@ -26,21 +25,6 @@ export default function AttendanceRecord({ records }: { records: Array<any> }) {
         setPage(0);
     };
 
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
-    const handleClickListItem = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleMenuItemClick = (
-        event: React.MouseEvent<HTMLElement>,
-        status: string,
-    ) => {
-        setAnchorEl(null);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
     return (
         <div>
             <div>
@@ -54,7 +38,6 @@ export default function AttendanceRecord({ records }: { records: Array<any> }) {
                             <TableCell>First Name</TableCell>
                             <TableCell>Last Name</TableCell>
                             <TableCell>Status</TableCell>
-                            <TableCell>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -73,47 +56,17 @@ export default function AttendanceRecord({ records }: { records: Array<any> }) {
                                     {row.last_name}
                                 </TableCell>
                                 <TableCell style={{ width: 160 }}>
-                                    {row.status}
-                                </TableCell>
-                                <TableCell>
-                                    <Button variant="text" className='icon-btn' onClick={handleClickListItem}
-                                        id="basic-button"
-                                        aria-controls={open ? 'basic-menu' : undefined}
-                                        aria-haspopup="true"
-                                        aria-expanded={open ? 'true' : undefined}
-                                    >...</Button>
-                                    <Menu
-                                        id="basic-menu"
-                                        aria-labelledby="basic-button"
-                                        anchorEl={anchorEl}
-                                        open={open}
-                                        onClose={handleClose}
-                                        slotProps={{
-                                            list: {
-                                                'aria-labelledby': 'basic-button',
-                                            }
-                                        }}
-                                        className='select-menu'
-                                    >
-                                        <MenuItem
-                                            key={'absent'}
-                                            onClick={(event) => handleMenuItemClick(event, 'absent')}
-                                        >
-                                            Mark as absent
-                                        </MenuItem>
-                                        <MenuItem
-                                            key={'present'}
-                                            onClick={(event) => handleMenuItemClick(event, 'present')}
-                                        >
-                                            Mark as present
-                                        </MenuItem>
-                                    </Menu>
+                                    <Chip
+                                        label={row.status === 'present' ? 'Present' : 'Absent'}
+                                        color={row.status === 'present' ? 'success' : 'default'}
+                                        size="small"
+                                    />
                                 </TableCell>
                             </TableRow>
                         ))}
                         {emptyRows > 0 && (
                             <TableRow style={{ height: 53 * emptyRows }}>
-                                <TableCell colSpan={6} />
+                                <TableCell colSpan={5} />
                             </TableRow>
                         )}
                     </TableBody>

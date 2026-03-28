@@ -60,13 +60,16 @@ const styles: Record<string, CSSProperties> = {
 
 function HomeContent() {
   const [isReady, setIsReady] = useState(false);
-  const [role, setRole] = useState<AppRole | null>(null);
+  const [role, setRole] = useState<AppRole | null>(() => getStoredRole());
   const searchParams = useSearchParams();
   const view = searchParams.get('view');
 
   useEffect(() => {
-    setRole(getStoredRole());
-    setIsReady(true);
+    const frame = window.requestAnimationFrame(() => {
+      setIsReady(true);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   if (!isReady) {

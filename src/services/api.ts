@@ -135,7 +135,7 @@ export const getSessions = async (course_id: string, class_id?: string): Promise
     return response.data;
 }
 
-export const getAttendanceRecords = async (session_id: number): Promise<any> => {
+export const getAttendanceRecords = async (session_id: string): Promise<any> => {
     let url = `/sessions/records/?session_id=${session_id}`;
 
     const response = await api.get(url)
