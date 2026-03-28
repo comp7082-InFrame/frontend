@@ -1,4 +1,5 @@
 import { formatEndDate, formatStartDate, formatTimeYYYYMMDD, formatTimeYYYYMMDDHHmmss } from '@/utils/formatTime';
+import { AdminStudent, AdminStudentCreateInput } from '@/types/admin';
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8000/api';
@@ -138,5 +139,26 @@ export const getAttendanceRecords = async (session_id: number): Promise<any> => 
     let url = `/sessions/records/?session_id=${session_id}`;
 
     const response = await api.get(url)
+    return response.data;
+}
+
+export const getStudents = async (): Promise<AdminStudent[]> => {
+    const response = await api.get('/students/');
+    return response.data;
+}
+
+export const createStudent = async (input: AdminStudentCreateInput): Promise<AdminStudent> => {
+    const formData = new FormData();
+    formData.append('student_number', input.student_number);
+    formData.append('first_name', input.first_name);
+    formData.append('last_name', input.last_name);
+    formData.append('email', input.email);
+    formData.append('course_ids', JSON.stringify(input.course_ids));
+    formData.append('photo', input.photo);
+
+    const response = await api.post('/students/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
     return response.data;
 }

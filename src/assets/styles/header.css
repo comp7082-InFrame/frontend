@@ -48,3 +48,20 @@
     font-weight: normal !important;
     color: #0f172a !important;
 }
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-logout {
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    background: transparent !important;
+    padding: 4px 12px !important;
+}
+
+.header-logout:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+}

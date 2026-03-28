@@ -36,12 +36,6 @@ export function useWebSocket(): UseWebSocketResult {
       ws.onclose = () => {
         setIsConnected(false);
         console.log('WebSocket disconnected');
-
-        // Auto-reconnect after 3 seconds
-        reconnectTimeoutRef.current = setTimeout(() => {
-          console.log('Attempting to reconnect...');
-          connect();
-        }, 3000);
       };
 
       ws.onerror = () => {

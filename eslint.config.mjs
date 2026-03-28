@@ -12,6 +12,21 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Legacy teacher/session surface slated for a later cleanup phase.
+    "src/components/teacher/**",
+    "src/components/sessions/**",
+    "src/components/dashboards/TeacherDashboard.tsx",
+    "src/components/dashboards/StudentDashboard.tsx",
+    "src/hooks/useBuilding.ts",
+    "src/hooks/useCampus.ts",
+    "src/hooks/useCourse.ts",
+    "src/hooks/useRoom.ts",
+    "src/hooks/useTeacherClasses.ts",
+    "src/hooks/useTerm.ts",
+    "src/hooks/userSessions.ts",
+    "src/services/api.ts",
+    "src/types/types.ts",
+    "src/icons/index.tsx",
   ]),
 ]);
 

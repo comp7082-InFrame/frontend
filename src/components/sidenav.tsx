@@ -1,15 +1,12 @@
 'use client'
 
 import { Box, List, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
-import { IoPerson } from "react-icons/io5";
 import { PiStudent } from "react-icons/pi";
-import { BsCameraVideoFill, BsPersonFillExclamation } from "react-icons/bs";
 import Link from "next/link";
 import "@/assets/styles/sidenav.css";
 import { usePathname } from "next/navigation";
 import { JSX } from "react";
 import { RiCalendarTodoLine } from "react-icons/ri";
-import { MdOutlineDashboard } from "react-icons/md";
 
 type MenuItem = {
     label: string;
@@ -23,19 +20,12 @@ type SidenavProps = {
 
 const menuByRole: Record<string, MenuItem[]> = {
     admin: [
-        { label: "Dashboard", path: "/", icon: <MdOutlineDashboard  /> },
-        { label: "Teachers", path: "/admin/teachers", icon: <IoPerson /> },
-        { label: "Students", path: "/admin/students", icon: <PiStudent /> },
-        { label: "New Request", path: "/admin/newrequest", icon: <BsPersonFillExclamation /> },
-        { label: "Camera", path: "/admin/camera", icon: <BsCameraVideoFill /> },
+        { label: "Students", path: "/", icon: <PiStudent /> },
     ],
     teacher: [
-        { label: "Dashboard", path: "/", icon: <MdOutlineDashboard  /> },
         { label: "Sessions", path: "/sessions", icon: <RiCalendarTodoLine  /> },
     ],
-    student: [
-        { label: "Dashboard", path: "/", icon: <MdOutlineDashboard  /> },
-    ],
+    student: [],
 };
 
 const Sidenav: React.FC<SidenavProps> = ({ role }) => {
