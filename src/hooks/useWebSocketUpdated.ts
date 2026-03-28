@@ -19,8 +19,20 @@ export function useWebSocket(): UseWebSocketResult {
   const [error, setError] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const disconnect = useCallback(() => {
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+    }
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+    setIsConnected(false);
+  }, []);
+
   const connect = useCallback((session_idParam?: number, class_idParam?: string, duration: number = 10) => {
-    console.log(session_idParam, class_idParam, duration)
+    console.log(session_idParam, class_idParam, duration);
     const sid = session_idParam;
     const cid = class_idParam;
 
@@ -28,29 +40,22 @@ export function useWebSocket(): UseWebSocketResult {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
     try {
-      let url = WS_URL + `?session_id=${sid}&class_id=${cid}`
+      const url = `${WS_URL}?session_id=${sid}&class_id=${cid}`;
       const ws = new WebSocket(url);
       wsRef.current = ws;
 
       ws.onopen = () => {
-
         setIsConnected(true);
         setError(null);
         console.log('WebSocket connected');
         setTimeout(() => {
-          disconnect()
-        }, (duration * 60 * 1000))
+          disconnect();
+        }, duration * 60 * 1000);
       };
 
       ws.onclose = () => {
         setIsConnected(false);
         console.log('WebSocket disconnected');
-
-        // Auto-reconnect after 3 seconds
-        // reconnectTimeoutRef.current = setTimeout(() => {
-        //   console.log('Attempting to reconnect...');
-        //   connect(sid, cid, duration);
-        // }, 3000);
       };
 
       ws.onerror = () => {
@@ -73,21 +78,10 @@ export function useWebSocket(): UseWebSocketResult {
           console.error('Failed to parse WebSocket message:', e);
         }
       };
-    } catch (e) {
+    } catch {
       setError('Failed to connect to WebSocket');
     }
-  }, []);
-
-  const disconnect = useCallback(() => {
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-    }
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
-    }
-    setIsConnected(false);
-  }, []);
+  }, [disconnect]);
 
   useEffect(() => {
     return () => {
