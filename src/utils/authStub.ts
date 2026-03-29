@@ -1,28 +1,59 @@
-export type AppRole = 'admin' | 'teacher';
+export type AppRole = 'admin' | 'teacher' | 'student';
 
-const ROLE_STORAGE_KEY = 'inframe-role';
+export interface StoredUser {
+  id: string;
+  first_name: string;
+  last_name: string;
+  role: string[];
+}
 
-export function getStoredRole(): AppRole | null {
+const USER_STORAGE_KEY = 'inframe-user';
+
+export function getStoredUser(): StoredUser | null {
   if (typeof window === 'undefined') {
     return null;
   }
 
-  const value = window.localStorage.getItem(ROLE_STORAGE_KEY);
-  return value === 'admin' || value === 'teacher' ? value : null;
+  const value = window.localStorage.getItem(USER_STORAGE_KEY);
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(value) as StoredUser;
+  } catch {
+    return null;
+  }
 }
 
-export function setStoredRole(role: AppRole) {
+export function setStoredUser(user: StoredUser) {
   if (typeof window === 'undefined') {
     return;
   }
 
-  window.localStorage.setItem(ROLE_STORAGE_KEY, role);
+  window.localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
 }
 
-export function clearStoredRole() {
+export function clearStoredUser() {
   if (typeof window === 'undefined') {
     return;
   }
 
-  window.localStorage.removeItem(ROLE_STORAGE_KEY);
+  window.localStorage.removeItem(USER_STORAGE_KEY);
+}
+
+/**
+ * Get the primary role from the stored user.
+ * Since users can have multiple roles, this returns the first one.
+ */
+export function getStoredRole(): AppRole | null {
+  const user = getStoredUser();
+  if (!user || !user.role || user.role.length === 0) {
+    return null;
+  }
+  const role = user.role[0];
+  if (role === 'admin' || role === 'teacher' || role === 'student') {
+    return role;
+  }
+  return null;
 }

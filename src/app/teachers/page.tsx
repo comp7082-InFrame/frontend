@@ -4,13 +4,11 @@ import { Suspense, useEffect, useState } from "react";
 import styles from "@/app/page.module.css";
 import DashboardHeader from "@/components/header";
 import Sidenav from "@/components/sidenav";
-import Sessions from "@/components/sessions/Sessions";
+import AdminTeachers from "@/components/admin/AdminTeachers";
 import { getStoredRole } from "@/utils/authStub";
-import "@/assets/styles/teacher-dashboard.css";
-import "@/assets/styles/scheduler.css";
 import "@/assets/styles/page.css";
 
-function SessionsPageContent() {
+function TeachersPageContent() {
   const [isReady, setIsReady] = useState(false);
   const role = getStoredRole();
 
@@ -22,7 +20,7 @@ function SessionsPageContent() {
     return <div style={{ padding: '20px' }}>Loading...</div>;
   }
 
-  if (!role) {
+  if (!role || role !== "admin") {
     return null;
   }
 
@@ -31,10 +29,10 @@ function SessionsPageContent() {
       <DashboardHeader />
       <div className="container-wrapper">
         <div className="container-div">
-          <Sidenav role={role as "admin" | "teacher" | "student"} />
+          <Sidenav role={role as "admin"} />
           <div className="content-wrapper">
             <div className="content-div">
-              {role === "teacher" && <Sessions />}
+              <AdminTeachers />
             </div>
           </div>
         </div>
@@ -43,10 +41,10 @@ function SessionsPageContent() {
   );
 }
 
-export default function DashboardPage() {
+export default function TeachersPage() {
   return (
     <Suspense fallback={null}>
-      <SessionsPageContent />
+      <TeachersPageContent />
     </Suspense>
   );
 }

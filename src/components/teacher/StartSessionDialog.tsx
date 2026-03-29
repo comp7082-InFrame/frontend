@@ -13,17 +13,19 @@ import { useCourses } from '@/hooks/useCourse';
 import { useBuildings } from '@/hooks/useBuilding';
 import { useCurrentTerm } from '@/hooks/useTerm';
 import { useWebSocket } from '@/hooks/useWebSocketUpdated';
-import { createSession } from '@/services/api';
+import { createSession, endSession } from '@/services/api';
 import { useTeacherClasses } from '@/hooks/useTeacherClasses';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { ScheduleEventDialogProps, State } from '@/types/types';
-
-const teacher_id = 'a877bfce-3300-476e-b529-109ad2ce2826'; // TODO update this later with login
+import { getStoredUser } from '@/utils/authStub';
+import { setActiveSession, clearActiveSession } from '@/utils/activeSession';
 
 export function StartSessionDialog({ openDialog, selectedEvent, setOpenDialog, currentSchedule, setSnackbar }: ScheduleEventDialogProps) {
+    const user = getStoredUser();
+    const teacher_id = user?.id || '';
     const [course_id, setCourse] = useState('');
     const [duration, setDuration] = useState(3);
     const [campus_id, setCampus] = useState('');
@@ -145,6 +147,17 @@ export function StartSessionDialog({ openDialog, selectedEvent, setOpenDialog, c
         setClassID(event.target.value)
     }
 
+    const handleEndSession = async () => {
+        if (session_id) {
+            try {
+                await endSession(session_id);
+            } catch (err) {
+                console.error('Failed to end session:', err);
+            }
+        }
+        clearActiveSession();
+        disconnect();
+    }
 
     const createNewSession = async () => {
         if (!course_id || !campus_id || !building_id || !room_id || !cameratype) {
@@ -160,12 +173,13 @@ export function StartSessionDialog({ openDialog, selectedEvent, setOpenDialog, c
                 setSession(res)
                 setSessionID(res.id)
                 setClassID(res.class_id)
+                setActiveSession({ session_id: res.id, class_id: res.class_id, duration, start_time: new Date().toISOString() });
                 setSnackbar({
                     open: true,
                     message: "Connecting to Server",
                     duration: duration * 60 * 1000
                 });
-                connect(res.id, res.class_id, duration);
+                connect(res.id, res.class_id, duration, () => { endSession(res.id); clearActiveSession(); });
             }
         )
 
@@ -341,7 +355,11 @@ export function StartSessionDialog({ openDialog, selectedEvent, setOpenDialog, c
 
                 <DialogActions>
                     <Button className='secondary-btn' onClick={setOpenDialog}>Close</Button>
-                    <Button onClick={createNewSession}>Start</Button>
+                    {isConnected ? (
+                        <Button variant="contained" color="error" onClick={handleEndSession}>End Session</Button>
+                    ) : (
+                        <Button onClick={createNewSession}>Start</Button>
+                    )}
                 </DialogActions>
             </Dialog>
         </>

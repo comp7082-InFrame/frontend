@@ -19,3 +19,26 @@ export interface AdminStudentCreateInput {
   course_ids: string[];
   photo: File;
 }
+
+export interface AdminTeacher {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  employee_number: string | null;
+  department: string | null;
+  title: string | null;
+  face_registered: boolean;
+  photo_path: string | null;
+  active: boolean;
+}
+
+export interface AdminTeacherCreateInput {
+  first_name: string;
+  last_name: string;
+  email: string;
+  employee_number: string;
+  department: string;
+  title: string;
+  photo: File;
+}

@@ -1,8 +1,6 @@
 'use client'
 
 import type { CSSProperties } from "react";
-import DashboardHeader from "@/components/header";
-import Sidenav from "@/components/sidenav";
 import "@/assets/styles/page.css";
 import { useCourses } from "@/hooks/useCourse";
 import { useCurrentTerm } from "@/hooks/useTerm";
@@ -87,16 +85,6 @@ export default function StudentsPage() {
     void loadStudents();
   }, [loadStudents]);
 
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      void loadStudents();
-    }, 3000);
-
-    return () => {
-      window.clearInterval(intervalId);
-    };
-  }, [loadStudents]);
-
   const submitStudent = async () => {
     if (!form.photo) {
       setError('A student photo is required');
@@ -136,14 +124,8 @@ export default function StudentsPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f3f6fa' }}>
-      <DashboardHeader />
-      <div className="container-wrapper">
-        <div className="container-div">
-          <Sidenav role="admin" />
-          <div className="content-wrapper">
-            <div className="content-div">
-              <section style={layoutCard}>
+    <>
+      <section style={layoutCard}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                   <div style={{ display: 'grid', gap: '8px' }}>
                     <h2 style={{ color: '#1f2937', fontSize: '28px' }}>Students</h2>
@@ -209,11 +191,7 @@ export default function StudentsPage() {
                     </TableBody>
                   </Table>
                 </TableContainer>
-              </section>
-            </div>
-          </div>
-        </div>
-      </div>
+      </section>
 
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle>Add student</DialogTitle>
@@ -298,6 +276,6 @@ export default function StudentsPage() {
         onClose={() => setSnackbar(null)}
         message={snackbar}
       />
-    </div>
+    </>
   );
 }

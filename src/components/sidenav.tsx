@@ -8,6 +8,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { JSX } from "react";
 import { RiCalendarTodoLine } from "react-icons/ri";
 import { BsCameraVideoFill } from "react-icons/bs";
+import { GiTeacher } from "react-icons/gi";
 
 type MenuItem = {
     label: string;
@@ -22,10 +23,13 @@ type SidenavProps = {
 const menuByRole: Record<string, MenuItem[]> = {
     admin: [
         { label: "Students", path: "/", icon: <PiStudent /> },
+        { label: "Teachers", path: "/teachers", icon: <GiTeacher /> },
         { label: "Cameras", path: "/?view=camera", icon: <BsCameraVideoFill /> },
     ],
     teacher: [
-        { label: "Sessions", path: "/sessions", icon: <RiCalendarTodoLine  /> },
+        { label: "Dashboard", path: "/", icon: <PiStudent /> },
+        { label: "Sessions", path: "/sessions", icon: <RiCalendarTodoLine /> },
+        { label: "Camera", path: "/camera", icon: <BsCameraVideoFill /> },
     ],
     student: [],
 };
