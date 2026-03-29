@@ -8,7 +8,7 @@ interface UseWebSocketResult {
   lastFrame: StreamFrame | null;
   lastUpdate: AttendanceUpdate | null;
   error: string | null;
-  connect: () => void;
+  connect: (session_id: number, class_id: string, duration: number) => void;
   disconnect: () => void;
 }
 
@@ -20,17 +20,37 @@ export function useWebSocket(): UseWebSocketResult {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const connect = useCallback(() => {
+  const disconnect = useCallback(() => {
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+    }
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+    setIsConnected(false);
+  }, []);
+
+  const connect = useCallback((session_idParam?: number, class_idParam?: string, duration: number = 10) => {
+    console.log(session_idParam, class_idParam, duration);
+    const sid = session_idParam;
+    const cid = class_idParam;
+
+    if (!sid || !cid) return;
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
     try {
-      const ws = new WebSocket(WS_URL);
+      const url = `${WS_URL}?session_id=${sid}&class_id=${cid}`;
+      const ws = new WebSocket(url);
       wsRef.current = ws;
 
       ws.onopen = () => {
         setIsConnected(true);
         setError(null);
         console.log('WebSocket connected');
+        setTimeout(() => {
+          disconnect();
+        }, duration * 60 * 1000);
       };
 
       ws.onclose = () => {
@@ -58,22 +78,10 @@ export function useWebSocket(): UseWebSocketResult {
           console.error('Failed to parse WebSocket message:', e);
         }
       };
-    } catch (e) {
+    } catch {
       setError('Failed to connect to WebSocket');
-      console.log(e)
     }
-  }, []);
-
-  const disconnect = useCallback(() => {
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-    }
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
-    }
-    setIsConnected(false);
-  }, []);
+  }, [disconnect]);
 
   useEffect(() => {
     return () => {

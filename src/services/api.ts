@@ -1,64 +1,164 @@
+import { formatEndDate, formatStartDate, formatTimeYYYYMMDD, formatTimeYYYYMMDDHHmmss } from '@/utils/formatTime';
+import { AdminStudent, AdminStudentCreateInput } from '@/types/admin';
 import axios from 'axios';
-import { Person, PersonListResponse, AttendanceCurrentResponse, AttendanceEvent } from '../types';
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+    baseURL: API_BASE_URL,
 });
 
-// Enrollment
-export const enrollPerson = async (name: string, photo: File): Promise<Person> => {
-  const formData = new FormData();
-  formData.append('name', name);
-  formData.append('photo', photo);
+export const getCampuses = async (campus_id?: string): Promise<any> => {
+    let url_string = '/campuses/'
+    if (campus_id && campus_id != '') {
+        url_string += '?campus_id=' + campus_id;
+    }
+    const response = await api.get(url_string);
+    return response.data;
+}
 
-  const response = await api.post('/enrollment/', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-  return response.data;
-};
+export const getBuildings = async (campus_id?: string, building_id?: string): Promise<any> => {
+    let url_string = '/buildings/'
+    if (campus_id != null && campus_id != '') {
+        url_string += '?campus_id=' + campus_id;
+    }
+    if (building_id != null && building_id != '') {
+        url_string += '&building_id=' + building_id;
+    }
+    const response = await api.get(url_string);
+    return response.data;
+}
 
-export const removePerson = async (personId: number): Promise<void> => {
-  await api.delete(`/enrollment/${personId}`);
-};
+export const getRoom = async (campus_id?: string, building_id?: string, room_id?: string): Promise<any> => {
+    let url_string = '/rooms/'
+    if (campus_id != null && campus_id != '') {
+        url_string += '?campus_id=' + campus_id;
+    }
+    if (building_id != null && building_id != '') {
+        url_string += '&building_id=' + building_id;
+    }
+    if (room_id != null && room_id != '') {
+        url_string += '&room_id=' + room_id;
+    }
+    const response = await api.get(url_string);
+    return response.data;
+}
 
-// Roster
-export const getRoster = async (): Promise<PersonListResponse> => {
-  const response = await api.get('/roster/');
-  return response.data;
-};
+export const getTerms = async (term_id?: string): Promise<any> => {
+    let url_string = '/terms/'
+    if (term_id != null && term_id != '') {
+        url_string += '?term_id=' + term_id;
+    }
+    const response = await api.get(url_string);
+    return response.data;
+}
 
-export const getPerson = async (personId: number): Promise<Person> => {
-  const response = await api.get(`/roster/${personId}`);
-  return response.data;
-};
+export const getTermsByDate = async (date: Date): Promise<any> => {
+    let date_str = formatStartDate(date);
+    let url_string = `/terms/by_date/?date=${date_str}`;
+    const response = await api.get(url_string);
+    return response.data;
+}
 
-export const getPersonPhotoUrl = (personId: number): string => {
-  return `${API_BASE_URL}/roster/${personId}/photo`;
-};
+export const getCourses = async (term_id: string, course_id?: string, teacher_id?: string): Promise<any> => {
+    let url_string = '/courses/?term_id=' + term_id;
 
-// Attendance
-export const getCurrentAttendance = async (): Promise<AttendanceCurrentResponse> => {
-  const response = await api.get('/attendance/current');
-  return response.data;
-};
+    if (course_id != null && course_id != '') {
+        url_string += '&course_id=' + course_id;
+    }
+    if (teacher_id != null && teacher_id != '') {
+        url_string += `&teacher_id=${teacher_id}`;
+    }
+    const response = await api.get(url_string);
+    return response.data;
+}
 
-export const getAttendanceHistory = async (
-  personId?: number,
-  eventType?: string,
-  limit?: number
-): Promise<AttendanceEvent[]> => {
-  const params = new URLSearchParams();
-  if (personId) params.append('person_id', personId.toString());
-  if (eventType) params.append('event_type', eventType);
-  if (limit) params.append('limit', limit.toString());
+export const getTeacherClasses = async (teacher_id: string, start_date: Date, end_date: Date, course_id?: string): Promise<any> => {
+    let start_date_str = formatStartDate(start_date);
+    let end_date_str = formatEndDate(end_date);
+    let url = `/classes/teacher_classes/?teacher_id=${teacher_id}&start_date=${start_date_str}&end_date=${end_date_str}`;
+    if (course_id != null && course_id != '') {
+        url += `&course_id=${course_id}`;
+    }
+    const response = await api.get(url);
+    return response.data;
+}
 
-  const response = await api.get(`/attendance/history?${params}`);
-  return response.data;
-};
+export const getTeacherCourseandTerm = async (teacher_id: string, start_date?: Date, end_date?: Date): Promise<any> => {
+    let url = `/classes/teacher/term_course/?teacher_id=${teacher_id}`;
+    if (start_date) {
+        let start_date_str = formatStartDate(start_date);
+        url += `&start_date=${start_date_str}`
+    }
+    if (end_date) {
+        let end_date_str = formatEndDate(end_date);
+        url += `&end_date=${end_date_str}`
+    }
+    const response = await api.get(url);
+    return response.data;
+}
 
-export const getTodayAttendance = async (): Promise<AttendanceEvent[]> => {
-  const response = await api.get('/attendance/today');
-  return response.data;
-};
+export const getStudentCourseandTerm = async (student_id: string, start_date?: Date, end_date?: Date): Promise<any> => {
+    let url = `/classes/student/term_course/?student_id=${student_id}`;
+    if (start_date) {
+        let start_date_str = formatStartDate(start_date);
+        url += `&start_date=${start_date_str}`
+    }
+    if (end_date) {
+        let end_date_str = formatEndDate(end_date);
+        url += `&end_date=${end_date_str}`
+    }
+    const response = await api.get(url);
+    return response.data;
+}
+
+export const createSession = async (class_id: string, teacher_id: string, room_id: string, start_time: Date, end_time: Date): Promise<any> => {
+
+    let body = {
+        "class_id": class_id,
+        "teacher_id": teacher_id,
+        "room_id": room_id,
+        "start_time": formatTimeYYYYMMDDHHmmss(start_time),
+        "end_time": formatTimeYYYYMMDDHHmmss(end_time)
+    }
+    const response = await api.post('/sessions/', body);
+    return response.data;
+}
+
+export const getSessions = async (course_id: string, class_id?: string): Promise<any> => {
+    let url = `/sessions/?course_id=${course_id}`;
+    if (class_id != null && class_id != '') {
+        url += `&class_id=${class_id}`;
+    }
+
+    const response = await api.get(url)
+    return response.data;
+}
+
+export const getAttendanceRecords = async (session_id: string): Promise<any> => {
+    let url = `/sessions/records/?session_id=${session_id}`;
+
+    const response = await api.get(url)
+    return response.data;
+}
+
+export const getStudents = async (): Promise<AdminStudent[]> => {
+    const response = await api.get('/students/');
+    return response.data;
+}
+
+export const createStudent = async (input: AdminStudentCreateInput): Promise<AdminStudent> => {
+    const formData = new FormData();
+    formData.append('student_number', input.student_number);
+    formData.append('first_name', input.first_name);
+    formData.append('last_name', input.last_name);
+    formData.append('email', input.email);
+    formData.append('course_ids', JSON.stringify(input.course_ids));
+    formData.append('photo', input.photo);
+
+    const response = await api.post('/students/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+    return response.data;
+}
