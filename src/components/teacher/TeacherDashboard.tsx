@@ -7,9 +7,11 @@ import { useEffect, useMemo, useState } from "react";
 import { Fragment } from "react";
 import StartSessionDialog from "./StartSessionDialog";
 import { useTeacherClasses } from "@/hooks/useTeacherClasses";
+import { getStoredUser } from "@/utils/authStub";
 
 function TeacherDashboard() {
-    const teacher_id = 'a877bfce-3300-476e-b529-109ad2ce2826'; // TODO update this later with login
+    const user = getStoredUser();
+    const teacher_id = user?.id || 'a877bfce-3300-476e-b529-109ad2ce2826';
 
     const customHeader = (date: any) => {
         const day = new Date(date.day);
@@ -46,10 +48,21 @@ function TeacherDashboard() {
         message: '',
         duration: 30000
     });
+    const [isReady, setIsReady] = useState(false);
+
     useEffect(() => {
         console.log("Snackbar state changed:", snackbar);
     }, [snackbar]);
 
+    useEffect(() => {
+        const timer = setTimeout(() => setIsReady(true), 500);
+        return () => clearTimeout(timer);
+    }, []);
+
+
+    if (!isReady) {
+        return null;
+    }
 
     return (
         <Fragment>
@@ -151,3 +164,4 @@ function TeacherDashboard() {
     )
 }
 export { TeacherDashboard }
+export default TeacherDashboard;

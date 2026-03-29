@@ -4,13 +4,11 @@ import { Suspense, useEffect, useState } from "react";
 import styles from "@/app/page.module.css";
 import DashboardHeader from "@/components/header";
 import Sidenav from "@/components/sidenav";
-import Sessions from "@/components/sessions/Sessions";
+import TeacherCameraPage from "@/components/teacher/TeacherCameraPage";
 import { getStoredRole } from "@/utils/authStub";
-import "@/assets/styles/teacher-dashboard.css";
-import "@/assets/styles/scheduler.css";
 import "@/assets/styles/page.css";
 
-function SessionsPageContent() {
+function CameraPageContent() {
   const [isReady, setIsReady] = useState(false);
   const role = getStoredRole();
 
@@ -22,7 +20,7 @@ function SessionsPageContent() {
     return <div style={{ padding: '20px' }}>Loading...</div>;
   }
 
-  if (!role) {
+  if (!role || role !== "teacher") {
     return null;
   }
 
@@ -34,7 +32,7 @@ function SessionsPageContent() {
           <Sidenav role={role as "admin" | "teacher" | "student"} />
           <div className="content-wrapper">
             <div className="content-div">
-              {role === "teacher" && <Sessions />}
+              <TeacherCameraPage />
             </div>
           </div>
         </div>
@@ -43,10 +41,10 @@ function SessionsPageContent() {
   );
 }
 
-export default function DashboardPage() {
+export default function CameraPage() {
   return (
     <Suspense fallback={null}>
-      <SessionsPageContent />
+      <CameraPageContent />
     </Suspense>
   );
 }

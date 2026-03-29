@@ -8,10 +8,11 @@ import AttendanceRecord from "./AttendanceRecord";
 import { useTeacherCourseTerm } from "@/hooks/useTeacherClasses";
 import { getAttendanceRecords, getSessions } from "@/services/api";
 import { formatTimeYYYYMMDDHHmmss12Hrs } from "@/utils/formatTime";
-
-const teacher_id = 'a877bfce-3300-476e-b529-109ad2ce2826'; // update this later with login
+import { getStoredUser } from "@/utils/authStub";
 
 function CourseByTerm() {
+    const user = getStoredUser();
+    const teacher_id = user?.id || '';
     const [expandedCourseTerm, setExpandedCourseTerm] = useState<string | null>(null);
     const [expandedCourseAttendanceHis, setExpandedCourseAttendanceHis] = useState<string | null>(null);
 

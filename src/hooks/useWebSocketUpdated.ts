@@ -8,7 +8,7 @@ interface UseWebSocketResult {
   lastFrame: StreamFrame | null;
   lastUpdate: AttendanceUpdate | null;
   error: string | null;
-  connect: (session_id: number, class_id: string, duration: number) => void;
+  connect: (session_id: number, class_id: string, duration: number, onSessionEnd?: () => void) => void;
   disconnect: () => void;
 }
 
@@ -31,7 +31,7 @@ export function useWebSocket(): UseWebSocketResult {
     setIsConnected(false);
   }, []);
 
-  const connect = useCallback((session_idParam?: number, class_idParam?: string, duration: number = 10) => {
+  const connect = useCallback((session_idParam?: number, class_idParam?: string, duration: number = 10, onSessionEnd?: () => void) => {
     console.log(session_idParam, class_idParam, duration);
     const sid = session_idParam;
     const cid = class_idParam;
@@ -49,6 +49,10 @@ export function useWebSocket(): UseWebSocketResult {
         setError(null);
         console.log('WebSocket connected');
         setTimeout(() => {
+          console.log('Session duration expired, calling onSessionEnd callback');
+          if (onSessionEnd) {
+            onSessionEnd();
+          }
           disconnect();
         }, duration * 60 * 1000);
       };

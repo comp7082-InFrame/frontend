@@ -87,6 +87,11 @@
     font-weight: 600;
 }
 
+/* Hide Scheduler's built-in header */
+.schedule-div .MuiPaper-root {
+    display: none;
+}
+
 .weekly-schedule * {
     color: var(--table-text-color);
 }

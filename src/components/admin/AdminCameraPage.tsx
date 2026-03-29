@@ -1,8 +1,6 @@
 'use client'
 
 import type { CSSProperties } from "react";
-import DashboardHeader from "@/components/header";
-import Sidenav from "@/components/sidenav";
 import "@/assets/styles/page.css";
 import { useWebSocket } from "@/hooks/useWebSocket";
 
@@ -23,14 +21,7 @@ export default function CameraPage() {
   const faces = lastFrame?.faces ?? [];
 
   return (
-    <div style={shellStyle}>
-      <DashboardHeader />
-      <div className="container-wrapper">
-        <div className="container-div">
-          <Sidenav role="admin" />
-          <div className="content-wrapper">
-            <div className="content-div">
-              <section style={{ ...cardStyle, display: 'grid', gap: '20px' }}>
+    <section style={{ ...cardStyle, display: 'grid', gap: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                   <div style={{ display: 'grid', gap: '8px' }}>
                     <h2 style={{ color: '#1f2937', fontSize: '28px' }}>Cameras</h2>
@@ -105,11 +96,6 @@ export default function CameraPage() {
                     ))}
                   </div>
                 </div>
-              </section>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </section>
   );
 }
