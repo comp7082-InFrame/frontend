@@ -1,5 +1,5 @@
 import { formatEndDate, formatStartDate, formatTimeYYYYMMDD, formatTimeYYYYMMDDHHmmss } from '@/utils/formatTime';
-import { AdminStudent, AdminStudentCreateInput, AdminTeacher, AdminTeacherCreateInput } from '@/types/admin';
+import { AdminStudent, AdminStudentCreateInput, AdminTeacher, AdminTeacherCreateInput, SignUpUserInput } from '@/types/admin';
 import { StoredUser } from '@/utils/authStub';
 import axios from 'axios';
 
@@ -15,6 +15,12 @@ export const getUsers = async (role?: string): Promise<StoredUser[]> => {
     if (role) {
         url += `?role=${role}`;
     }
+    const response = await api.get(url);
+    return response.data;
+}
+
+export const getUser = async (id: string): Promise<StoredUser> => {
+    let url = `/users/${id}/`;
     const response = await api.get(url);
     return response.data;
 }
@@ -214,6 +220,28 @@ export const createTeacher = async (input: AdminTeacherCreateInput): Promise<Adm
     const response = await api.post('/teachers/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
     });
+
+    return response.data;
+}
+
+export const updateSignUpUser = async (input: SignUpUserInput): Promise<StoredUser> => {
+    const formData = new FormData();
+    formData.append('first_name', input.first_name);
+    formData.append('last_name', input.last_name);
+    formData.append('email', input.email);
+    formData.append('role', input.role);
+    formData.append('uuid', input.uuid);
+    if (input.role === 'student' && input.student_number) {
+        formData.append('student_number', input.student_number);
+    }
+    if (input.role === 'teacher' && input.employee_number) {
+        formData.append('employee_number', input.employee_number);
+    }
+
+    if (input.photo) {
+        formData.append('photo', input.photo);
+    }
+    const response = await api.post(`/users/${input.uuid}/`, formData);
 
     return response.data;
 }

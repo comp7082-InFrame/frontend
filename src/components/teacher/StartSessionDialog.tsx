@@ -36,11 +36,12 @@ export function StartSessionDialog({ openDialog, selectedEvent, setOpenDialog, c
     const [currentClass, setCurrentClass] = useState(null);
     const [class_id, setClassID] = useState('');
     const [session, setSession] = useState<any>(null);
-    const [session_id, setSessionID] = useState(0);
+    const [session_id, setSessionID] = useState('');
     const { today } = useMemo(() => {
         const today = new Date();
         return { today };
     }, []);
+    
     const [selectedCourseDate, setSelectedCourseDate] = useState<Dayjs | null>(dayjs(new Date()));
 
     const {
@@ -122,7 +123,7 @@ export function StartSessionDialog({ openDialog, selectedEvent, setOpenDialog, c
 
     const handleCourseChange = (event: SelectChangeEvent) => {
         setCourse(event.target.value);
-        setCampus('');
+        setCampus('');  
         setBuilding('');
         setRoom('');
     };
@@ -225,7 +226,6 @@ export function StartSessionDialog({ openDialog, selectedEvent, setOpenDialog, c
                                     <b className='form-lbl'>Date: </b>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DatePicker
-                                            label="Controlled picker"
                                             value={selectedCourseDate}
                                             onChange={(newValue) => setSelectedCourseDate(newValue)}
                                         />

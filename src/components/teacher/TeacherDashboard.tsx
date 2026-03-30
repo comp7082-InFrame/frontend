@@ -9,6 +9,9 @@ import StartSessionDialog from "./StartSessionDialog";
 import { useTeacherClasses } from "@/hooks/useTeacherClasses";
 import { getStoredUser } from "@/utils/authStub";
 
+import "@/assets/styles/teacher-dashboard.css";
+import "@/assets/styles/scheduler.css";
+
 function TeacherDashboard() {
     const user = getStoredUser();
     const teacher_id = user?.id || 'a877bfce-3300-476e-b529-109ad2ce2826';

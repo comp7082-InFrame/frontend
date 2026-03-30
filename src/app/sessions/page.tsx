@@ -13,6 +13,7 @@ import "@/assets/styles/page.css";
 function SessionsPageContent() {
   const [isReady, setIsReady] = useState(false);
   const role = getStoredRole();
+  console.log(role)
 
   useEffect(() => {
     setIsReady(true);
