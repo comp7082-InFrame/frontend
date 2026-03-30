@@ -1,17 +1,23 @@
 "use client"
-import { AppBar, Avatar, Toolbar, Typography } from "@mui/material";
+import { AppBar, Avatar, Menu, MenuItem, Toolbar, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import Image from "next/image";
 import Logo from "@/assets/images/logo.svg";
 import "@/assets/styles/header.css";
 import { usePathname, useSearchParams } from "next/navigation";
-import { clearStoredUser, getStoredUser, getStoredRole } from "@/utils/authStub";
+import { clearStoredUser, getStoredUser, getStoredRole, setStoredUser } from "@/utils/authStub";
+import { getSupabaseBrowserClient } from "@/utils/supabase/browser-client";
+import { useState } from "react";
+import { signOut } from "@/utils/supabase/actions";
 
 export default function DashboardHeader() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const role = getStoredRole();
     const user = getStoredUser();
+    const supabase = getSupabaseBrowserClient();
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
 
     const getInitials = (firstName?: string, lastName?: string) => {
         if (!firstName && !lastName) return "U";
@@ -20,19 +26,33 @@ export default function DashboardHeader() {
         return (first + last).slice(0, 2);
     };
 
-    const title = pathname === "/" && role === "admin" && searchParams.get("view") === "camera"
-        ? "Cameras"
-        : pathname === "/" && role === "admin"
-        ? "Students"
-        : pathname === "/teachers"
-            ? "Teachers"
-            : pathname === "/" && role === "teacher"
-            ? "Dashboard"
-            : pathname.startsWith("/sessions")
-                ? "Sessions"
-                : pathname === "/camera"
-                ? "Live Camera"
-                : "Dashboard";
+    const title = pathname === "/auth" ? "" :
+        pathname === "/" && role === "admin" && searchParams.get("view") === "camera"
+            ? "Cameras"
+            : pathname === "/" && role === "admin"
+                ? "Students"
+                : pathname === "/teachers"
+                    ? "Teachers"
+                    : pathname === "/" && role === "teacher"
+                        ? "Dashboard"
+                        : pathname.startsWith("/sessions")
+                            ? "Sessions"
+                            : pathname === "/camera"
+                                ? "Live Camera"
+                                : "Dashboard";
+
+    async function handleSignOut() {
+        clearStoredUser();
+        setAnchorEl(null);
+        await signOut()
+    }
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleOpenAvatarMenu = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
 
     return (
         <AppBar
@@ -46,8 +66,9 @@ export default function DashboardHeader() {
                     priority
                 />
             </div>
-            <Toolbar
+            {user != null ? (<Toolbar
                 className="header-toolbar"
+
             >
                 <Typography
                     variant="h6"
@@ -58,20 +79,37 @@ export default function DashboardHeader() {
                 </Typography>
 
                 <div className="header-actions">
-                    <Button
-                        className="header-logout"
-                        onClick={() => {
-                            clearStoredUser();
-                            window.location.href = "/";
-                        }}
+                    <Avatar className="avatar-div"
+                        onClick={handleOpenAvatarMenu}
                     >
-                        Logout
-                    </Button>
-                    <Avatar className="avatar-div">
                         {getInitials(user?.first_name, user?.last_name)}
                     </Avatar>
+                    <Menu
+                        id="lock-menu"
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
+                        slotProps={{
+                            list: {
+                                'aria-labelledby': 'lock-button',
+                                role: 'listbox',
+                            },
+                        }}
+                    >
+
+                        <MenuItem
+                            key={'signout'}
+                            onClick={() => {
+                                handleSignOut();
+                                window.location.href = "/sign-in";
+                            }}
+                        >
+                            Logout
+                        </MenuItem>
+                    </Menu>
                 </div>
-            </Toolbar>
+            </Toolbar>) : null
+            }
         </AppBar>
     );
 }

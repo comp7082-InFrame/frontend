@@ -1,3 +1,5 @@
+import { AppRole } from "@/utils/authStub";
+
 export interface AdminStudent {
   id: string;
   student_number: string | null;
@@ -41,4 +43,15 @@ export interface AdminTeacherCreateInput {
   department: string;
   title: string;
   photo: File;
+}
+
+export interface SignUpUserInput {
+  uuid: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role: AppRole;
+  student_number?: string;
+  employee_number?: string;
+  photo?: File;
 }

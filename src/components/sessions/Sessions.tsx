@@ -10,8 +10,10 @@ import { Typography } from "@mui/material";
 export default function Sessions() {
     return (
         <>
-            <Typography sx={{ mb: 2, color: "text.secondary" }}>
-                Each session shows the full roster. Students marked present were recognized at least once during that class window.
+            <Typography sx={{ mb: 2 }}>
+                <span style={{ color: "var(--primary-text-color)" }}>
+                    Each session shows the full roster. Students marked present were recognized at least once during that class window.
+                </span>
             </Typography>
             <CourseByTerm />
         </>

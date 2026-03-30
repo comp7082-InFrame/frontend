@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from "react";
 import { Suspense, useEffect, useState } from "react";
-import { CircularProgress, Box } from "@mui/material";
+import { CircularProgress, Box, Button } from "@mui/material";
 import styles from "@/app/page.module.css";
 import DashboardHeader from "@/components/header";
 import Sidenav from "@/components/sidenav";
@@ -10,10 +10,13 @@ import Sessions from "@/components/sessions/Sessions";
 import TeacherDashboard from "@/components/teacher/TeacherDashboard";
 import AdminStudents from "@/components/admin/AdminStudents";
 import AdminCameraPage from "@/components/admin/AdminCameraPage";
-import { StoredUser, getStoredUser, setStoredUser, getStoredRole, clearStoredUser } from "@/utils/authStub";
+import { StoredUser, getStoredUser, setStoredUser, getStoredRole, clearStoredUser, AppRole, setUserRole } from "@/utils/authStub";
 import { useSearchParams } from "next/navigation";
-import { getUsers } from "@/services/api";
+import { getUser, getUsers } from "@/services/api";
 import "@/assets/styles/page.css";
+import { getSupabaseBrowserClient } from "@/utils/supabase/browser-client";
+import { useRouter } from 'next/navigation';
+import { signOut } from "@/utils/supabase/actions";
 
 const loginStyles: Record<string, CSSProperties> = {
   page: {
@@ -74,10 +77,7 @@ const loginStyles: Record<string, CSSProperties> = {
     cursor: 'pointer',
     transition: 'all 0.2s ease',
     textAlign: 'left',
-    ':hover': {
-      background: '#f9fafb',
-      borderColor: '#1f2937',
-    },
+
   },
   userName: {
     fontSize: '16px',
@@ -96,12 +96,15 @@ function HomeContent() {
   const [isReady, setIsReady] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [users, setUsers] = useState<StoredUser[]>([]);
-  const [usersByRole, setUsersByRole] = useState<Record<string, StoredUser[]>>({});
-  const [role, setRole] = useState<string | null>(() => getStoredRole());
+  const [role, setRole] = useState<string | null>(getStoredRole());
   const searchParams = useSearchParams();
   const view = searchParams.get('view');
+  const supabase = getSupabaseBrowserClient();
+  const [authUser, setAuthUser] = useState<any>(null);
+  const [userData, setUserData] = useState<any>(null);
+  const router = useRouter();
 
+  console.log("HomeContent rendered with authUser:", authUser, "userData:", userData, "role:", role);
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
       setIsReady(true);
@@ -111,24 +114,49 @@ function HomeContent() {
   }, []);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
         setLoading(true);
-        const data = await getUsers();
-        setUsers(data);
+        if (session?.user) {
+          setAuthUser(session.user);
+        } else {
+          try {
+            const { data: actualUser, error } = await supabase.auth.getUser();
+            if (error) throw error;
 
-        // Group users by role
-        const grouped: Record<string, StoredUser[]> = {};
-        data.forEach(user => {
-          const userRole = user.role && user.role.length > 0 ? user.role[0] : 'unknown';
-          if (!grouped[userRole]) {
-            grouped[userRole] = [];
+            setAuthUser(actualUser.user);
+          } catch (err) {
+            setError('Failed to load user data. Please refresh the page.');
+            setAuthUser(null);
+            setRole(null);
+            setLoading(false);
+            router.push('/sign-in');
           }
-          grouped[userRole].push(user);
-        });
 
-        setUsersByRole(grouped);
-        setError(null);
+        }
+      }
+    );
+
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!authUser) return; // only run if authUser is set
+    const fetchUser = async () => {
+      try {
+        const data = await getUser(authUser.id);
+        setUserData(data);
+        setStoredUser(data);
+
+        if (data?.role) {
+          if (data.role.length == 1) {
+            setRole(data.role[0]);
+          } else if (data.role.length > 1) {
+
+          }
+        }
       } catch (err) {
         setError('Failed to load users. Please refresh the page.');
         console.error(err);
@@ -137,15 +165,24 @@ function HomeContent() {
       }
     };
 
-    fetchUsers();
-  }, []);
+    fetchUser();
+  }, [authUser]);
 
+  async function handleSignOut() {
+    clearStoredUser();
+    setAuthUser(null);
+    setUserData(null);
+    setRole(null);
+    await signOut()
+    router.push('/sign-in');
+  }
   if (!isReady) {
     return null;
   }
 
   // If user is already logged in, show their dashboard
   if (role === 'admin') {
+    setUserRole('admin');
     const content = view === 'camera' ? <AdminCameraPage /> : <AdminStudents />;
     return (
       <div className={styles.page}>
@@ -165,6 +202,7 @@ function HomeContent() {
   }
 
   if (role === 'teacher') {
+    setUserRole('teacher');
     return (
       <div className={styles.page}>
         <DashboardHeader />
@@ -184,6 +222,7 @@ function HomeContent() {
 
   if (role === 'student') {
     // TODO: Implement student dashboard
+    setUserRole('teacher');
     return (
       <div style={loginStyles.page}>
         <section style={loginStyles.card}>
@@ -191,8 +230,8 @@ function HomeContent() {
           <p style={loginStyles.copy}>Coming soon...</p>
           <button
             onClick={() => {
-              clearStoredUser();
-              window.location.href = "/";
+              handleSignOut();
+              window.location.href = "/sign-in";
             }}
             style={{
               padding: '12px 24px',
@@ -212,9 +251,10 @@ function HomeContent() {
     );
   }
 
-  const selectUser = (user: StoredUser) => {
+  const selectUser = (user: StoredUser, role: AppRole) => {
     setStoredUser(user);
-    setRole(user.role && user.role.length > 0 ? user.role[0] : null);
+    setRole(role);
+    setUserRole(role);
   };
 
   if (loading) {
@@ -231,97 +271,89 @@ function HomeContent() {
 
   return (
     <main style={loginStyles.page}>
-      <section style={loginStyles.card}>
-        <p style={loginStyles.eyebrow}>InFrame</p>
-        <h1 style={loginStyles.title}>Select your account</h1>
-        {error && (
-          <p style={{ ...loginStyles.copy, color: '#dc2626' }}>{error}</p>
-        )}
-        <p style={loginStyles.copy}>
-          Choose your user account to log in.
-        </p>
+      {userData?.role.length > 0 && (
+        <section style={loginStyles.card}>
+          <p style={loginStyles.eyebrow}>InFrame</p>
+          <h1 style={loginStyles.title}>Select Your Role</h1>
+          {error && (
+            <p style={{ ...loginStyles.copy, color: '#dc2626' }}>{error}</p>
+          )}
+          <p style={loginStyles.copy}>
+            Choose your role to start.
+          </p>
 
-        {/* Admins */}
-        {usersByRole['admin'] && usersByRole['admin'].length > 0 && (
-          <div style={loginStyles.roleSection}>
-            <p style={loginStyles.roleLabel}>Admins</p>
-            <div style={loginStyles.userList}>
-              {usersByRole['admin'].map(user => (
-                <button
-                  key={user.id}
-                  style={loginStyles.userButton as any}
-                  onClick={() => selectUser(user)}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as any).style.background = '#f9fafb';
-                    (e.currentTarget as any).style.borderColor = '#1f2937';
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as any).style.background = '#fff';
-                    (e.currentTarget as any).style.borderColor = '#d6dde5';
-                  }}
-                >
-                  <p style={loginStyles.userName}>{user.first_name} {user.last_name}</p>
-                  <p style={loginStyles.userEmail}>{user.email}</p>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
+            {/* Admins */}
+            {userData.role.includes('admin') && (
+              <button
+                key={userData.id + 'admin'}
+                style={loginStyles.userButton as any}
+                onClick={() => selectUser(userData, 'admin')}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as any).style.background = '#f9fafb';
+                  (e.currentTarget as any).style.borderColor = '#1f2937';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as any).style.background = '#fff';
+                  (e.currentTarget as any).style.borderColor = '#d6dde5';
+                }}
+              >
+                Admin
+              </button>
+            )}
 
-        {/* Teachers */}
-        {usersByRole['teacher'] && usersByRole['teacher'].length > 0 && (
-          <div style={loginStyles.roleSection}>
-            <p style={loginStyles.roleLabel}>Teachers</p>
-            <div style={loginStyles.userList}>
-              {usersByRole['teacher'].map(user => (
-                <button
-                  key={user.id}
-                  style={loginStyles.userButton as any}
-                  onClick={() => selectUser(user)}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as any).style.background = '#f9fafb';
-                    (e.currentTarget as any).style.borderColor = '#1f2937';
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as any).style.background = '#fff';
-                    (e.currentTarget as any).style.borderColor = '#d6dde5';
-                  }}
-                >
-                  <p style={loginStyles.userName}>{user.first_name} {user.last_name}</p>
-                  <p style={loginStyles.userEmail}>{user.email}</p>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+            {/* Teachers */}
+            {userData.role.includes('teacher') && (
+              <button
+                key={userData.id + 'teacher'}
+                style={loginStyles.userButton as any}
+                onClick={() => selectUser(userData, 'teacher')}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as any).style.background = '#f9fafb';
+                  (e.currentTarget as any).style.borderColor = '#1f2937';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as any).style.background = '#fff';
+                  (e.currentTarget as any).style.borderColor = '#d6dde5';
+                }}
+              >
+                Teacher
+              </button>
+            )}
 
-        {/* Students */}
-        {usersByRole['student'] && usersByRole['student'].length > 0 && (
-          <div style={loginStyles.roleSection}>
-            <p style={loginStyles.roleLabel}>Students</p>
-            <div style={loginStyles.userList}>
-              {usersByRole['student'].map(user => (
-                <button
-                  key={user.id}
-                  style={loginStyles.userButton as any}
-                  onClick={() => selectUser(user)}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as any).style.background = '#f9fafb';
-                    (e.currentTarget as any).style.borderColor = '#1f2937';
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as any).style.background = '#fff';
-                    (e.currentTarget as any).style.borderColor = '#d6dde5';
-                  }}
-                >
-                  <p style={loginStyles.userName}>{user.first_name} {user.last_name}</p>
-                  <p style={loginStyles.userEmail}>{user.email}</p>
-                </button>
-              ))}
-            </div>
+            {/* Students */}
+            {userData.role.includes('student') && (
+              <button
+                key={userData.id + 'student'}
+                style={loginStyles.userButton as any}
+                onClick={() => selectUser(userData, 'student')}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as any).style.background = '#f9fafb';
+                  (e.currentTarget as any).style.borderColor = '#1f2937';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as any).style.background = '#fff';
+                  (e.currentTarget as any).style.borderColor = '#d6dde5';
+                }}
+              >
+                Student
+              </button>)}
+
           </div>
-        )}
-      </section>
+        </section>
+      )}
+      {userData?.role.length == 0 && (
+        <section style={loginStyles.card}>
+          <h3 style={loginStyles.title}>You don't have access to this page</h3>
+          <p style={loginStyles.copy}>Contact Admin for access.</p>
+          <Button className="secondary-btn"
+            onClick={() => {
+              handleSignOut();
+              window.location.href = "/sign-in";
+            }}
+          >Logout</Button>
+        </section>
+      )}
     </main>
   );
 }

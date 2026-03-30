@@ -6,7 +6,6 @@ export function useTeacherClasses(teacher_id: string, start_date: Date, end_date
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [refetchTrigger, setRefetchTrigger] = useState(0);
-
     const refetch = () => setRefetchTrigger(prev => prev + 1);
 
     useEffect(() => {
