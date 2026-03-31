@@ -104,7 +104,6 @@ function HomeContent() {
   const [userData, setUserData] = useState<any>(null);
   const router = useRouter();
 
-  console.log("HomeContent rendered with authUser:", authUser, "userData:", userData, "role:", role);
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
       setIsReady(true);
