@@ -7,7 +7,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AttendanceRecord from "./AttendanceRecord";
 import { useTeacherCourseTerm } from "@/hooks/useTeacherClasses";
 import { getAttendanceRecords, getSessions } from "@/services/api";
-import { formatTimeYYYYMMDDHHmmss12Hrs } from "@/utils/formatTime";
+import { formatTimeYYYYMMDDHHmmss12Hrs, formatUTCTimeYYYYMMDDHHmmss12Hrs } from "@/utils/formatTime";
 import { getStoredUser } from "@/utils/authStub";
 
 function CourseByTerm() {
@@ -78,7 +78,7 @@ function CourseByTerm() {
                                             }}
                                             sx={{ ml: 2 }}>
                                             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                                <Typography sx={{ fontWeight: 600 }}>{section.course_name} - {formatTimeYYYYMMDDHHmmss12Hrs(child.start_time)}</Typography>
+                                                <Typography sx={{ fontWeight: 600 }}>{section.course_name} - {formatUTCTimeYYYYMMDDHHmmss12Hrs(child.start_time)}</Typography>
                                             </AccordionSummary>
 
                                             <AccordionDetails>

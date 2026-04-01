@@ -1,4 +1,7 @@
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
 
 function formatTimeHHmm(time: Date | string) {
     return dayjs(time).format("HH:mm");
@@ -24,4 +27,9 @@ function formatTimeYYYYMMDDHHmmss12Hrs(time: Date | string) {
     return dayjs(time).format("YYYY-MM-DD hh:mm:ss A");
 }
 
-export { formatTimeHHmm, formatTimeYYYYMMDD, formatStartDate, formatEndDate, formatTimeYYYYMMDDHHmmss, formatTimeYYYYMMDDHHmmss12Hrs }
+function formatUTCTimeYYYYMMDDHHmmss12Hrs(time: Date | string) {
+    return dayjs.utc(time).local().format("YYYY-MM-DD hh:mm:ss A");
+}
+
+
+export { formatTimeHHmm, formatTimeYYYYMMDD, formatStartDate, formatEndDate, formatTimeYYYYMMDDHHmmss, formatTimeYYYYMMDDHHmmss12Hrs, formatUTCTimeYYYYMMDDHHmmss12Hrs }
