@@ -188,7 +188,6 @@ export function StartSessionDialog({ openDialog, selectedEvent, setOpenDialog, c
     }
 
     useEffect(() => {
-        console.log("check", isConnected)
         if (isConnected) {
             setSnackbar({
                 open: true,

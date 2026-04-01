@@ -140,10 +140,8 @@ export const createSession = async (class_id: string, teacher_id: string, room_i
         "start_time": start_time.toISOString(),
         "end_time": end_time.toISOString()
     }
-    console.log('createSession payload:', body);
     try {
         const response = await api.post('/sessions/', body);
-        console.log('createSession success:', response.data);
         return response.data;
     } catch (error: any) {
         console.error('createSession error details:', error.response?.data);
@@ -169,10 +167,8 @@ export const getAttendanceRecords = async (session_id: string): Promise<any> => 
 }
 
 export const endSession = async (session_id: string): Promise<any> => {
-    console.log('endSession called with session_id:', session_id);
     try {
         const response = await api.post(`/sessions/end`, { session_id });
-        console.log('endSession response:', response.data);
         return response.data;
     } catch (error) {
         console.error('endSession error:', error);

@@ -1,6 +1,6 @@
 import { createSvgIcon } from '@mui/material/utils';
 
-const StudentIcon = createSvgIcon(
+export const StudentIcon = createSvgIcon(
   <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M0 20L17 19.9999C16.7081 17.1383 14.7123 15.2593 12.1827 14.3631C11.0733 15.2805 9.64 15.8333 8.075 15.8333C6.64017 15.8333 5.31606 15.3686 4.25071 14.5843C1.99442 15.5505 0.26972 17.3557 0 20Z" fill="white" />
     <path d="M2.55 9.58333C2.55 11.5544 3.62386 13.2796 5.22928 14.2272C7.11337 13.6505 9.24787 13.5965 11.1789 14.0651C12.6402 13.0904 13.6 11.4468 13.6 9.58333C13.6 9.12634 13.5423 8.68256 13.4336 8.25862C13.1702 8.38972 12.9803 8.34306 12.6806 8.15963V6.59021C12.4039 6.18175 12.0721 5.81222 11.6957 5.49178L8.5 6.66667L4.72213 5.27774C3.40173 6.26755 2.55 7.82792 2.55 9.58333Z" fill="white" />
@@ -13,7 +13,7 @@ const StudentIcon = createSvgIcon(
 );
 
 // or with custom SVG
-const PlusIcon = createSvgIcon(
+export const PlusIcon = createSvgIcon(
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
