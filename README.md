@@ -23,17 +23,18 @@ npm ci
 ```
 
 ### 3. Run Development Server
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
 
 ```bash
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to see the result.
+
+## Live Deployment
+
+**Production:** https://frontend-blush-five-ezyftppj51.vercel.app/
+
+The app is automatically deployed to Vercel on every push to the `main` branch via GitHub Actions.
 
 ## Testing
 
