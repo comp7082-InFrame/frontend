@@ -1,14 +1,5 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Set up environment
-create .env file with information
-```
-NEXT_PUBLIC_SUPABASE_URL='https://thxehlughlgjascajwfe.supabase.co'
-NEXT_PUBLIC_SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoeGVobHVnaGxnamFzY2Fqd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NzY5OTAsImV4cCI6MjA4NzA1Mjk5MH0.buc7yGUIceK-0GrZcEN9IOtxQ6_FBm2Ssb2hFmAbkgY'
-API_BASE_URL = 'http://localhost:8000/api'
-
-```
-
 ## Getting Started
 
 First, run the development server:
