@@ -137,9 +137,9 @@ The following test files are provided as examples:
 
 ### Page Tests
 
-- **[src/app/layout.test.tsx](src/app/layout.test.tsx)**: Root layout structure verification (9 tests)
+- **[src/app/layout.test.tsx](src/app/layout.test.tsx)**: Root layout structure verification (10 tests)
 - **[src/app/page.test.tsx](src/app/page.test.tsx)**: Main dashboard page with role-based rendering (7 tests)
-- **[src/app/camera/page.test.tsx](src/app/camera/page.test.tsx)**: Teacher camera page with role checks (8 tests)
+- **[src/app/camera/page.test.tsx](src/app/camera/page.test.tsx)**: Teacher camera page with role checks (7 tests)
 - **[src/app/sessions/page.test.tsx](src/app/sessions/page.test.tsx)**: Teacher sessions page (9 tests)
 - **[src/app/teachers/page.test.tsx](src/app/teachers/page.test.tsx)**: Admin teachers management page (9 tests)
 - **[src/app/sign-in/page.test.tsx](src/app/sign-in/page.test.tsx)**: Sign-in page structure verification (6 tests)
@@ -150,20 +150,27 @@ The following test files are provided as examples:
 - **[src/components/admin/AdminStudents.test.tsx](src/components/admin/AdminStudents.test.tsx)**: Student management component (12 tests)
 - **[src/components/admin/AdminTeachers.test.tsx](src/components/admin/AdminTeachers.test.tsx)**: Teacher management component with form dialogs (15+ tests, 85.58% coverage)
 - **[src/components/admin/AdminCameraPage.test.tsx](src/components/admin/AdminCameraPage.test.tsx)**: Admin camera page (6 tests)
+- **[src/components/admin/NewRequests.test.tsx](src/components/admin/NewRequests.test.tsx)**: Admin request page (7 tests)
 
 ### Teacher Component Tests
 
-- **[src/components/teacher/StartSessionDialog.test.tsx](src/components/teacher/StartSessionDialog.test.tsx)**: Session start dialog with dropdowns and date picker (10 tests, 82.6% coverage)
-- **[src/components/teacher/TeacherDashboard.test.tsx](src/components/teacher/TeacherDashboard.test.tsx)**: Teacher dashboard with scheduler (8 tests, 69.41% coverage)
+- **[src/components/teacher/StartSessionDialog.test.tsx](src/components/teacher/StartSessionDialog.test.tsx)**: Session start dialog with dropdowns and date picker (9 tests, 82.6% coverage)
+- **[src/components/teacher/TeacherDashboard.test.tsx](src/components/teacher/TeacherDashboard.test.tsx)**: Teacher dashboard with scheduler (9 tests, 69.41% coverage)
 - **[src/components/teacher/TeacherCameraPage.test.tsx](src/components/teacher/TeacherCameraPage.test.tsx)**: Teacher camera page with WebSocket data and face detection (13 tests, 92.78% coverage)
 
 ### Dashboard Component Tests
 
+- **[src/components/dashboards/StudentDashboard.test.tsx](src/components/dashboards/StudentDashboard.test.tsx)**: Dashboard page wrapper with layout composition (7 tests, 33.33 % coverage)
+- **[src/components/dashboards/AdminDashboard.test.tsx](src/components/dashboards/AdminDashboard.test.tsx)**: Dashboard page wrapper with layout composition (11 tests, 100% coverage)
 - **[src/components/dashboards/TeacherDashboard.test.tsx](src/components/dashboards/TeacherDashboard.test.tsx)**: Dashboard page wrapper with layout composition (9 tests, 100% coverage)
+
 
 ### Session Component Tests
 
-- **[src/components/sessions/Sessions.test.tsx](src/components/sessions/Sessions.test.tsx)**: Sessions wrapper component (10 tests)
+- **[src/components/sessions/Sessions.test.tsx](src/components/sessions/Sessions.test.tsx)**: Sessions wrapper component (11 tests)
+- **[src/components/sessions/AttendanceRecord.test.tsx](src/components/sessions/AttendanceRecord.test.tsx)**: Sessions wrapper component (12 tests)
+- **[src/components/sessions/CourseByTerm.test.tsx](src/components/sessions/CourseByTerm.test.tsx)**: Sessions wrapper component (12 tests)
+
 
 ### Service and Hook Tests
 
@@ -171,7 +178,20 @@ The following test files are provided as examples:
 - **[src/hooks/hooks.test.ts](src/hooks/hooks.test.ts)**: Custom hooks availability and structure (13 tests)
 - **[src/types/types.test.ts](src/types/types.test.ts)**: Type definitions validation (12 tests)
 
+### Utility / Misc Component Tests
+- **[src/components/SimpleAuthPage.test.tsx](src/components/SimpleAuthPage.test.tsx)**: Simple authentication component (12 tests)
+- **[src/icons/index.test.tsx](src/icons/index.test.tsx)**: Icon exports validation (12 tests)
+- **[src/utils/Numberfield.test.tsx](src/utils/Numberfield.test.tsx)**: Number input field component (12 tests)
+
+
 ## Common Testing Patterns
+- Use render() from @testing-library/react for component rendering
+- Use screen.getBy* queries to assert DOM elements
+- Mock external modules with jest.mock()
+- Mock async calls with mockResolvedValue()
+- Isolate components by mocking children and CSS modules
+- Test state updates and user events with user-event
+- Organize tests by component, not by folder
 
 ### Mocking Custom Hooks
 
@@ -320,35 +340,41 @@ Currently implemented test coverage:
 - **Utilities**: 100% coverage (formatTime: 6 tests, authStub: 8 tests)
 - **Core Components**: 60%+ coverage (header: 3 tests, sidenav: 8 tests, emailPassword: 5 tests)
 - **Admin Components**: 
-  - AdminStudents: 12 tests
-  - AdminTeachers: 15+ tests, **85.58% coverage** (improved from 0%)
-  - AdminCameraPage: 6 tests
+  - AdminStudents: 12 tests, 20.64% lines, 0% functions
+  - AdminTeachers: 15+ tests, 85.58% lines, 23.07% functions (improved from 0%)
+  - AdminCameraPage: 6 tests, 92.07% lines, 100% functions
+  - NewRequests: 7 tests, 33.33% lines, 0% functions
 - **Teacher Components**: 
-  - StartSessionDialog: 10 tests, **82.6% coverage** (improved from 0%)
-  - TeacherDashboard (teacher): 8 tests, **69.41% coverage** (improved from 0%)
+  - StartSessionDialog: 10 tests, 82.6% lines, 9.09% functions (improved from 0%)
+  - TeacherDashboard (teacher): 8 tests, 69.41% lines, 16.66% functions (improved from 0%)
   - TeacherCameraPage: 13 tests, **92.78% coverage**, 100% function coverage (improved from 0%)
 - **Dashboard Components**:
   - TeacherDashboard (dashboards): 9 tests, **100% statement coverage** (improved from 0%)
+  - AdminDashboard: 100% lines/functions
+  - StudentDashboard: 33.33% lines, 0% functions
   - Overall dashboards: 88.09% average
 - **Pages**: 54 tests covering all application routes
   - Auth routes: 18 tests (sign-in page, sign-up page, emailPassword)
   - Dashboard: 7 tests
   - Teacher pages: 17 tests (camera, sessions, teachers/admin)
   - Root layout: 9 tests
-- **Session Components**: 10 tests
-- **Services**: 8 tests (API service verification)
-- **Hooks**: 13 tests (custom hooks availability)
-- **Types**: 12 tests (type definitions validation)
+- **Session Components**: 10 tests (AttendanceRecord, CourseByTerm, Sessions) Coverage ranges: 5–47% lines, 0% functions
+- **Services**: 8 tests (API service verification), 21.39% lines, 0% functions
+- **Hooks**: 13 tests (custom hooks availability) Coverage ranges: 8–50% lines, 0–100% functions
+- **Types**: 12 tests (type definitions validation) 100% coverage
+- **Misc Components**
+  - SimpleAuthPage: 12 tests, 100% coverage
+  - Numberfield: 12 tests, 98.23% lines, 100% functions
 
 ### Test Breakdown by Type
 
-- **Component Rendering Tests**: 85+ tests (new rendering-based pattern)
-- **Page/Route Tests**: 54 tests
-- **Utility/Function Tests**: 14 tests
-- **Service/API Tests**: 8 tests
-- **Hook Tests**: 13 tests
-- **Type Definition Tests**: 12 tests
-- **Async/Integration Tests**: 180+ tests
+- **Component Rendering Tests**: 160+ tests (includes Core, Admin, Teacher, Dashboard, Session, Misc components)
+- **Page/Route Tests**: 54 tests (all application routes: Auth, Dashboard, Teacher, Root layout)
+- **Utility/Function Tests**: 14 tests (formatTime, authStub, Numberfield, activeSession)
+- **Service/API Tests**: 8 tests (api.ts coverage 21.39%)
+- **Hook Tests**: 13 tests (custom hooks: useTeacherClasses, useWebSocket, etc.)
+- **Type Definition Tests**: 12 tests (admin.ts, stream.ts, types.ts)
+- **Async/Integration Tests**: 180+ tests (covers WebSocket updates, sessions, teacher/admin workflows, and API interactions)
 
 ## Coverage Goals
 
