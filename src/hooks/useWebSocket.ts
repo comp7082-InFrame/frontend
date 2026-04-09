@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { StreamFrame, AttendanceUpdate, WebSocketMessage } from '../types/stream';
 
-const WS_URL = 'ws://localhost:8000/ws/stream';
+const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws/stream';
 
 interface UseWebSocketResult {
   isConnected: boolean;
